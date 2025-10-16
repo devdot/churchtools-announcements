@@ -1,0 +1,40 @@
+{
+    "name": "devdot_announcements",
+    "private": true,
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "fix": "eslint --fix",
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "deploy": "npm run build && node scripts/package.js"
+    },
+    "devDependencies": {
+        "@churchtools/churchtools-client": "^1.4.0",
+        "@churchtools/colors": "^0.1.1",
+        "@churchtools/utils": "^0.9.1",
+        "@tailwindcss/vite": "^4.1.14",
+        "@tanstack/vue-query": "^5.90.3",
+        "@types/node": "^24.3.0",
+        "@vitejs/plugin-vue": "^6.0.1",
+        "@vue/eslint-config-prettier": "^10.2.0",
+        "@vue/eslint-config-typescript": "^14.6.0",
+        "eslint": "^9.37.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-vue": "^10.5.0",
+        "prettier": "^3.6.2",
+        "prettier-plugin-organize-imports": "^4.3.0",
+        "prettier-plugin-tailwindcss": "^0.7.0",
+        "tailwindcss": "^4.1.14",
+        "typescript": "^5.9.3",
+        "vite": "^7.1.2",
+        "vite-plugin-eslint": "^1.8.1",
+        "vue-tsc": "^3.1.1"
+    },
+    "dependencies": {
+        "pinia": "^3.0.3",
+        "vue": "^3.5.22",
+        "vue-router": "^4.6.0"
+    }
+}

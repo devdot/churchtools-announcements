@@ -1,0 +1,64 @@
+<script setup lang="ts">
+import { computed, reactive, ref, type Component } from 'vue';
+import { ruleFilterTypeNames, type Rule, type RuleFilterMap } from '../../types/Rule';
+import And from './Filter/And.vue';
+import Calendar from './Filter/Calendar.vue';
+import Create from './Filter/Create.vue';
+import { filterDefaults, type FilterPropsBase } from './Filter/FilterProps';
+import Generic from './Filter/Generic.vue';
+import Or from './Filter/Or.vue';
+import Text from './Filter/Text.vue';
+
+const props = withDefaults(
+    defineProps<
+        FilterPropsBase & {
+            rule: Rule;
+        }
+    >(),
+    filterDefaults,
+);
+const rule = reactive(props.rule);
+const canDelete = computed(() => props.canEdit && props.level > 0);
+
+const filters: RuleFilterMap<Component> = {
+    and: And,
+    or: Or,
+    create: Create,
+    calendar: Calendar,
+    text: Text,
+};
+
+const emits = defineEmits<{ (e: 'deletedRule'): void }>();
+
+const header = computed(() => ruleFilterTypeNames[rule.filter.type] ?? rule.filter.type);
+const filter = computed(() => filters[rule.filter.type] ?? Generic);
+
+const collapsed = ref(false);
+</script>
+<template>
+    <div class="border border-gray-500">
+        <div class="flex border-b border-gray-500 bg-white px-2">
+            <div class="grow">
+                {{ header }}
+            </div>
+            <div class="flex gap-2">
+                <div>
+                    <input v-model="rule.negate" :disabled="!props.canEdit" type="checkbox" />
+                    <span v-if="rule.negate">◐</span>
+                    <span v-else>◑</span>
+                </div>
+                <div v-if="canDelete" class="cursor-pointer" @click="emits('deletedRule')">🗑</div>
+                <div v-if="collapsed" class="cursor-pointer" @click="collapsed = false">▼</div>
+                <div v-else class="cursor-pointer" @click="collapsed = true">▲</div>
+            </div>
+        </div>
+        <div v-if="!collapsed" class="bg-gray-100 px-4 py-2">
+            <component
+                :is="filter"
+                :canEdit="props.canEdit"
+                :filter="rule.filter"
+                :level="props.level"
+            ></component>
+        </div>
+    </div>
+</template>

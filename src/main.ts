@@ -1,11 +1,11 @@
 import { churchtoolsClient } from '@churchtools/churchtools-client';
+// import { ctStyleguide } from '@churchtools/styleguide';
 import { ctUtils } from '@churchtools/utils';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
 import { router } from './router';
-// import { ctStyleguide } from '@churchtools/styleguide';
 
 // only import reset.css in development mode to keep the production bundle small and to simulate CT environment
 if (import.meta.env.MODE === 'development') {
@@ -28,12 +28,13 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 // @ts-expect-error window.t will be supplied by churchtools environment
+const t = window.t ?? ((e: string) => e);
 app.use(ctUtils, {
     baseUrl,
     pinia,
-    t: window.t ?? ((e: string) => e),
+    t: t,
 });
-// app.use(ctStyleguide, { baseUrl, t: key => key });
+// app.use(ctStyleguide, { baseUrl, t: t });
 app.use(VueQueryPlugin);
 
 const username = import.meta.env.VITE_USERNAME;

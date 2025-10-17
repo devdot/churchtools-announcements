@@ -10,7 +10,7 @@ const category = findCategory(props.categoryId);
 <template>
     <div v-if="isLoading">Lade Daten</div>
     <div v-else-if="category === null">Kategorie nicht gefunden!</div>
-    <div v-else class="flex flex-col">
+    <div v-else class="flex w-full flex-col">
         <h1>
             {{ category?.name ?? '' }}
         </h1>

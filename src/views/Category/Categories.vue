@@ -22,7 +22,7 @@ const newName = ref('neue Kategorie');
             </button>
         </div>
         <table>
-            <tr v-for="category in categories" v-bind:key="category.id">
+            <tr v-for="category in categories" :key="category.id">
                 <td>
                     <RouterLink
                         :to="{

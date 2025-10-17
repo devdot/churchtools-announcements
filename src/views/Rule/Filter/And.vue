@@ -22,7 +22,7 @@ const deletedRule = function (key: number) {
 </script>
 <template>
     <div class="w-full">
-        <div v-for="(rule, key) in filter.and" v-bind:key="key">
+        <div v-for="(rule, key) in filter.and" :key="key">
             <Rule
                 :canEdit="props.canEdit"
                 :level="props.level + 1"

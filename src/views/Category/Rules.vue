@@ -64,7 +64,10 @@ const preview = computed(() =>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="appointment in preview" v-bind:key="appointment.id">
+                    <tr
+                        v-for="appointment in preview"
+                        :key="appointment.id + appointment.startDate"
+                    >
                         <td>{{ appointment.title }}</td>
                         <td>{{ appointment.startDate }}</td>
                     </tr>

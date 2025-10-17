@@ -12,7 +12,7 @@ const fieldNames = ['Titel', 'Untertitel', 'Beschreibung'];
     <div>
         <div>
             <select v-model="filter.field" :disabled="!props.canEdit">
-                <option v-for="(field, key) in fields" v-bind:key="field" :value="field">
+                <option v-for="(field, key) in fields" :key="field" :value="field">
                     {{ fieldNames[key] }}
                 </option>
             </select>

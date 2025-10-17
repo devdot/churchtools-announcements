@@ -8,7 +8,7 @@ const { categories } = useCategories();
         <div class="grid">
             <RouterLink
                 v-for="category in categories"
-                v-bind:key="category.id"
+                :key="category.id"
                 :to="{ name: 'category', params: { categoryId: category.id } }"
             >
                 {{ category.name }}

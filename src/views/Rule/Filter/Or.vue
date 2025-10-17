@@ -25,7 +25,7 @@ const deletedRule = function (key: number) {
     <div class="grid w-full grid-flow-col grid-rows-1 overflow-x-auto">
         <div
             v-for="(rule, key) in filter.or"
-            v-bind:key="key"
+            :key="key"
             :class="['relative min-w-72', key !== lastKey ? 'pr-12' : '']"
         >
             <Rule

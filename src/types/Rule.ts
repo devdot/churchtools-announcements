@@ -31,14 +31,17 @@ export type RuleFilterFunction<T extends RuleFilter> = {
     (filter: T, appointment: AppointmentBase): boolean;
 };
 
-export interface RuleFilterAnd extends RuleFilter {
-    type: 'and';
-    and: Rule[];
+export interface RuleFilterGroup extends RuleFilter {
+    type: 'or' | 'and';
+    group: Rule[];
 }
 
-export interface RuleFilterOr extends RuleFilter {
+export interface RuleFilterAnd extends RuleFilterGroup {
+    type: 'and';
+}
+
+export interface RuleFilterOr extends RuleFilterGroup {
     type: 'or';
-    or: Rule[];
 }
 
 export interface RuleFilterCreate extends RuleFilter {
@@ -68,8 +71,8 @@ export const filterFactory = function (type: RuleFilterType) {
         });
     };
     const factories: RuleFilterMap<{ (): RuleFilter }> = {
-        and: baseFactory<RuleFilterAnd>('and', { and: [] }),
-        or: baseFactory<RuleFilterOr>('or', { or: [] }),
+        and: baseFactory<RuleFilterAnd>('and', { group: [] }),
+        or: baseFactory<RuleFilterOr>('or', { group: [] }),
         create: baseFactory<RuleFilterCreate>('create', { create: null }),
         calendar: baseFactory<RuleFilterCalendar>('calendar', { calendarId: -1 }),
         text: baseFactory<RuleFilterText>('text', {
@@ -112,7 +115,7 @@ export function filterRule(rule: Rule, appointment: AppointmentBase): boolean {
 
     switch (rule.filter.type) {
         case 'and': {
-            const rules = (rule.filter as RuleFilterAnd).and;
+            const rules = (rule.filter as RuleFilterAnd).group;
             for (const rule of rules) {
                 if (filterRule(rule, appointment) !== expected) {
                     return false;
@@ -121,7 +124,7 @@ export function filterRule(rule: Rule, appointment: AppointmentBase): boolean {
             return true;
         }
         case 'or': {
-            const rules = (rule.filter as RuleFilterOr).or;
+            const rules = (rule.filter as RuleFilterOr).group;
             for (const rule of rules) {
                 if (filterRule(rule, appointment) === expected) {
                     return true;

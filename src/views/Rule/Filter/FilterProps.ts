@@ -1,8 +1,8 @@
 import type { RuleFilter } from '../../../types/Rule';
 
 export interface FilterPropsBase {
-    canEdit: boolean;
-    level: number;
+    canEdit?: boolean;
+    level?: number;
 }
 
 export interface FilterProps<TFilter extends RuleFilter> extends FilterPropsBase {

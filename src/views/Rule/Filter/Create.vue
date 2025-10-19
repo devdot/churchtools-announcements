@@ -20,7 +20,7 @@ watch(filter, value =>
     <div>
         <select v-model="filter.create">
             <option class="italic" :value="null">Filter wählen</option>
-            <option v-for="option in options" v-bind:key="option" :value="option">
+            <option v-for="option in options" :key="option" :value="option">
                 {{ names[option] ?? option }}
             </option>
         </select>

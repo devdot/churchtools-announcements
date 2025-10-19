@@ -30,7 +30,7 @@ const filters: RuleFilterMap<Component> = {
 const emits = defineEmits<{ (e: 'deletedRule'): void }>();
 
 const header = computed(() => ruleFilterTypeNames[rule.filter.type] ?? rule.filter.type);
-const filter = computed(() => filters[rule.filter.type] ?? Generic);
+const filter = computed(() => filters[rule.filter.type ?? ''] ?? Generic);
 
 const collapsed = ref(false);
 

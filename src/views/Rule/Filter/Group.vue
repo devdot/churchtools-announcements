@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { ruleFactory, type RuleFilterGroup, type Rule as RuleType } from '../../../types/Rule';
+import { addRule, type RuleFilterGroup } from '../../../types/Rule';
 import Rule from '../Rule.vue';
 import { filterDefaults, type FilterProps } from './FilterProps';
 
 const props = withDefaults(defineProps<FilterProps<RuleFilterGroup>>(), filterDefaults);
-const group = ref(props.filter.group);
+// const nextRuleNr = ref(props.filter.nextRuleNr);
+const group = ref(props.filter.rules);
 const vertical = computed(() => props.filter.type === 'and');
 
 const isEmpty = computed(() => group.value.length === 0);
 const lastKey = computed(() => group.value.length - 1);
 
-const createdRule = function (rule: RuleType) {
-    group.value.push(rule);
+const createRule = function () {
+    addRule(props.filter);
 };
 const deletedRule = function (key: number) {
     if (group.value[key]) {
         group.value.splice(key, 1);
-        uniqueKeys.splice(key, 1);
     }
 };
 
@@ -35,21 +35,12 @@ const connectBg = computed(() => {
             return 'bg-gray-700';
     }
 });
-
-const uniqueKeys: number[] = [];
-let nextKey = 0;
-const getUniqueKey = function (key: number) {
-    if (typeof uniqueKeys[key] === 'number') {
-        return uniqueKeys[key];
-    }
-    return (uniqueKeys[key] = nextKey++);
-};
 </script>
 <template>
     <div :class="['flex', vertical ? 'flex-col' : 'overflow-x-auto']">
         <div
             v-for="(rule, key) in group"
-            :key="getUniqueKey(key)"
+            :key="rule.ruleNr"
             :class="[
                 'relative',
                 vertical ? '' : 'min-w-72',
@@ -86,7 +77,7 @@ const getUniqueKey = function (key: number) {
                     connectBg,
                     'h-8 w-8 cursor-pointer rounded-full text-center text-xl text-white',
                 ]"
-                @click="createdRule(ruleFactory())"
+                @click="createRule()"
             >
                 +
             </button>

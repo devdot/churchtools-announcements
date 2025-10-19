@@ -2,13 +2,14 @@ import {
     useCustomModuleDataValuesMutations,
     useCustomModuleDataValuesQuery,
 } from '@churchtools/utils';
-import { computed, type Ref } from 'vue';
+import { computed, type ComputedRef, type Ref } from 'vue';
 import {
     type Category,
     type CategoryData,
-    type CategoryDataRule,
+    type CategoryDataRules,
     type CategoryDataSettings,
 } from '../types/Category';
+import { addRule, ruleFactory } from '../types/Rule';
 import useModule from './useModule';
 
 export default function useCategory(category: Category) {
@@ -54,9 +55,52 @@ export default function useCategory(category: Category) {
     };
 
     // rules
-    const { data: dataRules } = loadData<CategoryDataRule>();
-    const rules = computed(() => filterData(dataRules, 'rule'));
+    const { data: dataRules, dataUpdatedAt: rulesUpdatedAt } = loadData<CategoryDataRules>();
+    const defaultRules = {
+        id: 0,
+        type: 'rules',
+        ...ruleFactory('and'),
+    };
+    addRule(defaultRules.filter, 'calendar');
+    const rules: ComputedRef<CategoryDataRules> = computed(
+        () => filterData(dataRules, 'rules').pop() ?? defaultRules,
+    );
     const rulesLoaded = isDataLoaded(dataRules);
+    const { createCustomDataValue: createRulesValue, updateCustomDataValue: updateRulesValue } =
+        useCustomModuleDataValuesMutations<CategoryDataRules>(moduleId, categoryId);
+    const updateRules = async (rules: CategoryDataRules) => {
+        // make sure the rule is an and rule
+        if (rules.filter.type !== 'and') {
+            const old = rules;
+            rules = {
+                ...ruleFactory('and'),
+                id: rules.id,
+                type: 'rules',
+            };
+            rules.filter.rules = [old];
+        }
+
+        // remove empty create fields
+        const filterCreateFilters = function (rule: Rule) {
+            if (rule.filter.type === 'and' || rule.filter.type === 'or') {
+                rule.filter.rules = rule.filter.rules.filter(filterCreateFilters);
+            }
+            return rule.filter.type !== 'create';
+        };
+        rules.filter.rules = rules.filter.rules.filter(filterCreateFilters);
+
+        // upsert
+        if (rules.id > 0) {
+            return updateRulesValue({
+                dataCategoryId: category.id,
+                ...rules,
+            });
+        }
+        return createRulesValue({
+            dataCategoryId: category.id,
+            ...rules,
+        });
+    };
 
     return {
         settings,
@@ -64,5 +108,7 @@ export default function useCategory(category: Category) {
         updateSettings,
         rules,
         rulesLoaded,
+        updateRules,
+        rulesUpdatedAt,
     };
 }

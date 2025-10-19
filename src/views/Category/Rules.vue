@@ -1,55 +1,96 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed,
+    onBeforeUnmount,
+    reactive,
+    ref,
+    toRaw,
+    watch,
+    type Reactive,
+    type Ref,
+    type WatchHandle,
+} from 'vue';
 import useAppointments from '../../composables/useAppointments';
-import type { Category } from '../../types/Category';
-import { filterRule } from '../../types/Rule';
+import useCategory from '../../composables/useCategory';
+import type { Category, CategoryDataRules } from '../../types/Category';
+import { copyRule, filterRule } from '../../types/Rule';
 import Rule from '../Rule/Rule.vue';
 
 const props = defineProps<{ category: Category; categoryId: string | number }>();
 const category = props.category;
 
-// todo: temporary rule for testing
-const rule = reactive({
-    negate: false,
-    filter: {
-        type: 'and',
-        and: [
-            {
-                negate: true,
-                filter: {
-                    type: 'calendar',
-                    calendarId: 1,
-                },
-            },
-            {
-                negate: true,
-                filter: {
-                    type: 'text',
-                    field: 'title',
-                    regex: false,
-                    search: 'Gottesdienst',
-                },
-            },
-        ],
-    },
+const { updateRules, rules: storageRules, rulesLoaded, rulesUpdatedAt } = useCategory(category);
+const rules: Reactive<CategoryDataRules> = reactive(storageRules.value);
+const updateKey: Ref<number> = ref(0);
+
+watch(storageRules, () => {
+    stopRulesWatch();
+    // Object.assign(rules, toRaw(storageRules.value)); // this does not work well
+    copyRule(rules, storageRules.value);
+    updateKey.value++;
+    startRulesWatch();
+});
+
+const save = function () {
+    isChanged.value = false;
+    isSaving.value = true;
+
+    updateRules(toRaw(rules)).then(function () {
+        isSaving.value = false;
+        updateKey.value++;
+    });
+};
+
+const isChanged = ref(false);
+const isSaving = ref(false);
+let handleRulesWatch: WatchHandle | null = null;
+const stopRulesWatch = function () {
+    if (handleRulesWatch !== null) {
+        handleRulesWatch();
+        handleRulesWatch = null;
+    }
+};
+const startRulesWatch = function () {
+    stopRulesWatch();
+
+    handleRulesWatch = watch(
+        rules,
+        () => {
+            isChanged.value = true;
+        },
+        { deep: true },
+    );
+};
+startRulesWatch();
+
+onBeforeUnmount(() => {
+    if (isChanged.value && confirm('Änderungen vor dem Verlassen speichern?')) {
+        save();
+    }
 });
 
 const { appointments, isLoading } = useAppointments(category);
 const preview = computed(() =>
-    appointments.value.filter(appointment => filterRule(rule, appointment)),
+    appointments.value.filter(appointment => filterRule(rules, appointment)),
 );
-
-// todo: catch the change/updated rule
-// when saving, make sure to remove all 'create' filter types
 </script>
 
 <template>
     <h1>Regeln</h1>
+    <div>storage: {{ storageRules.id }} editor: {{ rules.id }} key: {{ updateKey }}</div>
+    {{ JSON.stringify(rules) }}
+    <div class="text-gray-700 italic">Zuletzt geladen: {{ new Date(rulesUpdatedAt) }}</div>
     <div class="grid w-full grid-cols-2 gap-8">
         <div>
-            <Rule :rule="rule" />
-            <button>Speichern</button>
-            <!-- todo: den benutzer beim verlassen darauf hinweisen, dass noch nicht gespeichert ist -->
+            <button
+                class="cursor-pointer rounded-md bg-blue-400 p-2 disabled:bg-gray-400"
+                :disabled="!(isChanged || rules.id === 0) && !isSaving"
+                @click="save"
+            >
+                Speichern
+            </button>
+            <Rule v-if="rulesLoaded" :key="updateKey" :canEdit="!isSaving" :rule="rules" />
+            <div v-else>Lade Regeln ...</div>
         </div>
         <div>
             <div>Vorschau:</div>

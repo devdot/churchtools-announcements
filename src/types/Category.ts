@@ -25,6 +25,6 @@ export interface CategoryDataSettings extends CategoryData, CategorySettings {
     type: 'settings';
 }
 
-export interface CategoryDataRule extends CategoryData, Rule {
-    type: 'rule';
+export interface CategoryDataRules extends CategoryData, Rule {
+    type: 'rules';
 }

@@ -12,6 +12,7 @@ import {
 } from 'vue';
 import useAppointments from '../../composables/useAppointments';
 import useCategory from '../../composables/useCategory';
+import type { AnnouncementSet } from '../../types/Annoucement';
 import type { Category, CategoryDataRules } from '../../types/Category';
 import { copyRule, filterRule } from '../../types/Rule';
 import Rule from '../Rule/Rule.vue';
@@ -69,7 +70,13 @@ onBeforeUnmount(() => {
     }
 });
 
-const { appointments, isLoading } = useAppointments(category);
+const announcement: Ref<AnnouncementSet> = ref({
+    id: 0,
+    date: new Date(),
+    title: 'Test',
+    eventId: null,
+});
+const { appointments, isLoading } = useAppointments(category, announcement);
 const preview = computed(() =>
     appointments.value.filter(appointment => filterRule(rules, appointment)),
 );

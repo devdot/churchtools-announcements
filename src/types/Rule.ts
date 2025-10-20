@@ -118,7 +118,7 @@ const functions: RuleFilterMap<RuleFilterFunction<RuleFilter>> = {
         const field = appointment[filter.field] ?? null;
         if (typeof field === 'string') {
             if (filter.regex) {
-                return field.match(filter.search) !== null;
+                return field.match(new RegExp(filter.search)) !== null;
             }
             return field === filter.search;
         }

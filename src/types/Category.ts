@@ -1,3 +1,4 @@
+import type { AnnouncementSet } from './Annoucement';
 import type { Rule } from './Rule';
 
 export interface Category {
@@ -18,7 +19,12 @@ export interface CategorySettings {
     description: string;
     cutoffDays: number; // look-ahead number of days
     calendarIds: number[]; // input calendars
-    // add interval (weekly / monthly / ...) or association with events (in calendar ?!)
+    interval: {
+        type: 'week' | 'month' | 'never';
+        day: number; // js Date.getDay, Sunday = 0
+    };
+    eventCalendarId: number | null;
+    pruneDays: number; // prune data that is older than number of days
 }
 
 export interface CategoryDataSettings extends CategoryData, CategorySettings {
@@ -27,4 +33,8 @@ export interface CategoryDataSettings extends CategoryData, CategorySettings {
 
 export interface CategoryDataRules extends CategoryData, Rule {
     type: 'rules';
+}
+
+export interface CategoryDataAnnouncementSet extends CategoryData, AnnouncementSet {
+    type: 'set';
 }

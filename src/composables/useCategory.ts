@@ -3,9 +3,11 @@ import {
     useCustomModuleDataValuesQuery,
 } from '@churchtools/utils';
 import { computed, type ComputedRef, type Ref } from 'vue';
+import type { AnnouncementSet } from '../types/Annoucement';
 import {
     type Category,
     type CategoryData,
+    type CategoryDataAnnouncementSet,
     type CategoryDataRules,
     type CategoryDataSettings,
 } from '../types/Category';
@@ -31,6 +33,12 @@ export default function useCategory(category: Category) {
         description: '',
         cutoffDays: 180,
         calendarIds: [-1],
+        interval: {
+            type: 'week',
+            day: 0, // sunday
+        },
+        eventCalendarId: null,
+        pruneDays: 14,
     };
     const settings = computed(() =>
         Object.assign(
@@ -102,6 +110,44 @@ export default function useCategory(category: Category) {
         });
     };
 
+    // announcements
+    const { data: dataAnnouncementSets } = loadData<CategoryDataAnnouncementSet>();
+    const announcementSets = computed(() =>
+        filterData(dataAnnouncementSets, 'set')
+            .map(set => ({
+                ...set,
+                date: set.date instanceof Date ? set.date : new Date(set.date),
+            }))
+            .sort((a, b) => a.date.getTime() - b.date.getTime()),
+    );
+    const announcementSetsLoaded = isDataLoaded(dataAnnouncementSets);
+    const {
+        createCustomDataValue: createAnnouncementSetValue,
+        updateCustomDataValue: updateAnnouncementSetValue,
+        deleteCustomDataValue: deleteAnnouncementSetValue,
+    } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementSet>(moduleId, categoryId);
+    const createAnnouncementSet = (set: Omit<AnnouncementSet, 'id'>) => {
+        return createAnnouncementSetValue({
+            dataCategoryId: category.id,
+            id: 0,
+            type: 'set',
+            ...set,
+        });
+    };
+    const updateAnnouncementSet = (set: AnnouncementSet) => {
+        return updateAnnouncementSetValue({
+            dataCategoryId: category.id,
+            type: 'set',
+            ...set,
+        });
+    };
+    const deleteAnnouncementSet = (set: AnnouncementSet) => {
+        return deleteAnnouncementSetValue({
+            dataCategoryId: category.id,
+            ...set,
+        });
+    };
+
     return {
         settings,
         settingsLoaded,
@@ -110,5 +156,10 @@ export default function useCategory(category: Category) {
         rulesLoaded,
         updateRules,
         rulesUpdatedAt,
+        announcementSets,
+        announcementSetsLoaded,
+        createAnnouncementSet,
+        updateAnnouncementSet,
+        deleteAnnouncementSet,
     };
 }

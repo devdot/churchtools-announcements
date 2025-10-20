@@ -20,7 +20,7 @@ const props = defineProps<{ category: Category; categoryId: string | number }>()
 const category = props.category;
 
 const { updateRules, rules: storageRules, rulesLoaded, rulesUpdatedAt } = useCategory(category);
-const rules: Reactive<CategoryDataRules> = reactive(storageRules.value);
+const rules: Reactive<CategoryDataRules> = reactive(structuredClone(toRaw(storageRules.value)));
 const updateKey: Ref<number> = ref(0);
 
 watch(storageRules, () => {

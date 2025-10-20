@@ -9,26 +9,26 @@ import useCategory from './useCategory';
 
 export default function useAppointments(category: Category) {
     const { settings, settingsLoaded } = useCategory(category);
-    const { calendars, isLoading: isLoadingCalendars } = useCalendars();
+    const { calendars, calendarIds, isLoading: isLoadingCalendars } = useCalendars();
 
-    // todo: it seems like caching is not working yet!
     const { data, isLoading } = useQuery<AppointmentCalculatedWithIncludes[]>({
-        queryKey: ['appointments', computed(() => settings.value.id)],
+        queryKey: ['appointments', settings, calendarIds],
         queryFn: () => {
             const today = new Date(); // todo: utilize an announcement date as base (perhaps the entire composable needs this as an parameter)
 
             // fill calendar ids if all (-1) are selected
-            const calendarIds =
+            const calIds =
                 (settings.value.calendarIds[0] ?? -1) !== -1
                     ? settings.value.calendarIds
-                    : calendars.value.map(calendar => calendar.id);
+                    : calendarIds.value;
 
             return churchtoolsClient.get('/calendars/appointments', {
                 from: format(today, 'YYYY-MM-DD'),
                 to: format(addDays(today, settings.value.cutoffDays), 'YYYY-MM-DD'),
-                calendar_ids: calendarIds,
+                calendar_ids: calIds,
             });
         },
+        staleTime: 1000 * 60, // 1 minute
         enabled: computed(() => settingsLoaded.value && !isLoadingCalendars.value),
     });
 

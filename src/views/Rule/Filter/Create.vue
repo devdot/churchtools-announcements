@@ -6,8 +6,9 @@ import {
     type RuleFilterCreate,
     type RuleFilterType,
 } from '../../../types/Rule';
+import { filterDefaults, type FilterProps } from './FilterProps';
 
-const props = defineProps<{ filter: RuleFilterCreate }>();
+const props = withDefaults(defineProps<FilterProps<RuleFilterCreate>>(), filterDefaults);
 const filter = reactive(props.filter);
 const options: RuleFilterType[] = ['and', 'or', 'calendar', 'text'];
 const names = ref(ruleFilterTypeNames);

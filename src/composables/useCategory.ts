@@ -11,7 +11,7 @@ import {
     type CategoryDataRules,
     type CategoryDataSettings,
 } from '../types/Category';
-import { addRule, ruleFactory } from '../types/Rule';
+import { addRule, ruleFactory, type Rule } from '../types/Rule';
 import useModule from './useModule';
 
 export default function useCategory(category: Category) {
@@ -64,12 +64,12 @@ export default function useCategory(category: Category) {
 
     // rules
     const { data: dataRules, dataUpdatedAt: rulesUpdatedAt } = loadData<CategoryDataRules>();
-    const defaultRules = {
+    const defaultRules: CategoryDataRules = {
         id: 0,
         type: 'rules',
         ...ruleFactory('and'),
     };
-    addRule(defaultRules.filter, 'calendar');
+    if (defaultRules.filter.type === 'and') addRule(defaultRules.filter, 'calendar');
     const rules: ComputedRef<CategoryDataRules> = computed(
         () => filterData(dataRules, 'rules').pop() ?? defaultRules,
     );
@@ -85,7 +85,8 @@ export default function useCategory(category: Category) {
                 id: rules.id,
                 type: 'rules',
             };
-            rules.filter.rules = [old];
+            if (rules.filter.type === 'and') rules.filter.rules = [old];
+            else throw 'Failed to assert new rule is AND filter';
         }
 
         // remove empty create fields

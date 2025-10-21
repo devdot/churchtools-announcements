@@ -61,11 +61,13 @@ const { data: eventsData } = useQuery<Event[]>({
             to: getDateString(addDays(new Date(), settings.value.cutoffDays)),
         });
     },
-    placeholderData: [],
+    initialData: [],
+    initialDataUpdatedAt: 0,
     staleTime: 1000 * 60 * 10, // 10 minutes
 });
 const events = computed(() =>
     eventsData.value
+        // event.calendar is defined wrong in official types.d.ts
         .filter(
             event =>
                 event.calendar?.id ??

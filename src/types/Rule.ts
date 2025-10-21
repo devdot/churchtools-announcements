@@ -7,18 +7,21 @@ export interface Rule {
     filter: RuleFilter;
 }
 
-export interface RuleFilter {
+export interface RuleFilterBase {
     type: RuleFilterType;
 }
 
+export type RuleFilter =
+    | RuleFilterAnd
+    | RuleFilterOr
+    | RuleFilterCreate
+    | RuleFilterCalendar
+    | RuleFilterText;
+export type RuleFilterType = RuleFilter['type'];
 export type RuleFilterMap<TValue> = {
-    and: TValue;
-    or: TValue;
-    create: TValue;
-    calendar: TValue;
-    text: TValue;
+    [key in RuleFilterType]: TValue;
 };
-export type RuleFilterType = keyof RuleFilterMap<boolean>;
+
 export const ruleFilterTypeNames: RuleFilterMap<string> = {
     and: 'Und-Verknüpfung',
     or: 'Oder-Verknüpfung',
@@ -29,11 +32,7 @@ export const ruleFilterTypeNames: RuleFilterMap<string> = {
 
 // todo: Filter date min / max
 
-export type RuleFilterFunction<T extends RuleFilter> = {
-    (filter: T, appointment: AppointmentBase): boolean;
-};
-
-export interface RuleFilterGroup extends RuleFilter {
+export interface RuleFilterGroup extends RuleFilterBase {
     nextRuleNr: number;
     type: 'or' | 'and';
     rules: Rule[];
@@ -47,17 +46,17 @@ export interface RuleFilterOr extends RuleFilterGroup {
     type: 'or';
 }
 
-export interface RuleFilterCreate extends RuleFilter {
+export interface RuleFilterCreate extends RuleFilterBase {
     type: 'create';
     create: RuleFilterType | null;
 }
 
-export interface RuleFilterCalendar extends RuleFilter {
+export interface RuleFilterCalendar extends RuleFilterBase {
     type: 'calendar';
     calendarId: number;
 }
 
-export interface RuleFilterText extends RuleFilter {
+export interface RuleFilterText extends RuleFilterBase {
     type: 'text';
     field: RuleFilterTextFields;
     search: string;
@@ -67,7 +66,11 @@ export interface RuleFilterText extends RuleFilter {
 export type RuleFilterTextFields = 'title' | 'subtitle' | 'description';
 
 export const filterFactory = function (type: RuleFilterType) {
-    const baseFactory = <T extends RuleFilter>(type: string, filter: Omit<T, 'type'>) => {
+    const baseFactory = <T extends RuleFilter>(
+        type: T['type'],
+        filter: Omit<T, 'type'>,
+    ): { (): T } => {
+        // @ts-expect-error nasty error for subtypes that extend RuleFilter but aren't part of RuleFilter
         return () => ({
             type: type,
             ...filter,
@@ -108,30 +111,38 @@ export const addRule = function (
     return rule;
 };
 
-const functions: RuleFilterMap<RuleFilterFunction<RuleFilter>> = {
-    create: (filter: RuleFilterCreate, appointment: AppointmentBase) =>
-        filter !== null || appointment !== null,
-    calendar: function (filter: RuleFilterCalendar, appointment: AppointmentBase) {
-        return filter.calendarId === -1 || appointment.calendar.id === filter.calendarId;
-    },
-    text: function (filter: RuleFilterText, appointment: AppointmentBase) {
-        const field = appointment[filter.field] ?? null;
-        if (typeof field === 'string') {
-            if (filter.regex) {
-                return field.match(new RegExp(filter.search)) !== null;
-            }
-            return field === filter.search;
-        }
-        return false;
-    },
-};
-
 export function filterRule(rule: Rule, appointment: AppointmentBase): boolean {
+    // https://stackoverflow.com/questions/64527150/in-typescript-how-to-select-a-type-from-a-union-using-a-literal-type-property
+    const functions: Omit<
+        {
+            [key in RuleFilterType]: {
+                (filter: Extract<RuleFilter, { type: key }>, appointment: AppointmentBase): boolean;
+            };
+        },
+        'and' | 'or'
+    > = {
+        create: (filter: RuleFilterCreate, appointment: AppointmentBase) =>
+            filter !== null || appointment !== null,
+        calendar: function (filter: RuleFilterCalendar, appointment: AppointmentBase) {
+            return filter.calendarId === -1 || appointment.calendar.id === filter.calendarId;
+        },
+        text: function (filter: RuleFilterText, appointment: AppointmentBase) {
+            const field = appointment[filter.field] ?? null;
+            if (typeof field === 'string') {
+                if (filter.regex) {
+                    return field.match(new RegExp(filter.search)) !== null;
+                }
+                return field === filter.search;
+            }
+            return false;
+        },
+    };
+
     const expected = rule.negate !== true;
 
     switch (rule.filter.type) {
         case 'and': {
-            const rules = (rule.filter as RuleFilterAnd).rules;
+            const rules = rule.filter.rules;
             for (const rule of rules) {
                 if (filterRule(rule, appointment) !== expected) {
                     return false;
@@ -140,7 +151,7 @@ export function filterRule(rule: Rule, appointment: AppointmentBase): boolean {
             return true;
         }
         case 'or': {
-            const rules = (rule.filter as RuleFilterOr).rules;
+            const rules = rule.filter.rules;
             for (const rule of rules) {
                 if (filterRule(rule, appointment) === expected) {
                     return true;
@@ -151,8 +162,8 @@ export function filterRule(rule: Rule, appointment: AppointmentBase): boolean {
         default: {
             const func = functions[rule.filter.type];
             if (typeof func === 'function') {
-                // @ts-expect-error ignore type casting of rule here because we cannot do it better
-                return functions[rule.filter.type](rule.filter, appointment) === expected;
+                // @ts-expect-error ts does not follow rule.filter type correctly
+                return func(rule.filter, appointment) === expected;
             }
             throw 'Type not found: ' + rule.filter.type;
         }
@@ -164,7 +175,7 @@ export const copyRule = function (dstObj: Rule, srcObj: Rule): void {
     const dst = dstObj;
     const src = toRaw(srcObj);
 
-    const _removeExtras = function (dst: object, src: object) {
+    const _removeExtras = function <T extends object = object>(dst: T, src: T) {
         for (const key in dst) {
             if (typeof src[key] === 'undefined') {
                 delete dst[key];
@@ -172,7 +183,11 @@ export const copyRule = function (dstObj: Rule, srcObj: Rule): void {
         }
     };
 
-    const _copyProperties = function (dst: object, src: object, except: string[] = []) {
+    const _copyProperties = function <T extends object = object>(
+        dst: T,
+        src: T,
+        except: string[] = [],
+    ) {
         for (const key in src) {
             if (!except.includes(key)) {
                 dst[key] = src[key];
@@ -193,13 +208,15 @@ export const copyRule = function (dstObj: Rule, srcObj: Rule): void {
     _copyProperties(dst.filter, src.filter, ['rules']);
 
     // take care of recursion
+    // @ts-expect-error no type narrowing
     if (Array.isArray(src.filter.rules ?? null)) {
+        // @ts-expect-error no type narrowing
         if (!Array.isArray(dst.filter.rules ?? null)) {
-            dst.filter.rules = [];
+            (dst.filter as RuleFilterGroup).rules = [];
         }
 
-        const srcRules: Rule[] = src.filter.rules;
-        const dstRules: Rule[] = dst.filter.rules;
+        const srcRules: Rule[] = (src.filter as RuleFilterGroup).rules;
+        const dstRules: Rule[] = (dst.filter as RuleFilterGroup).rules;
 
         const srcNrMap: Rule[] = [];
         srcRules.forEach(rule => (srcNrMap[rule.ruleNr] = rule));

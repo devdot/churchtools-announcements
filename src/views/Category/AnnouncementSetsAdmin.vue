@@ -7,6 +7,7 @@ import { useAnnouncements } from '../../composables/useAnnouncements';
 import useCategory from '../../composables/useCategory';
 import type { Category, CategoryDataAnnouncementSet } from '../../types/Category';
 import type { Event } from '../../utils/ct-types';
+import Loading from '../Utils/Loading.vue';
 
 const props = defineProps<{
     category: Category;
@@ -155,5 +156,5 @@ const prune = async function () {
             </tbody>
         </table>
     </div>
-    <div v-else>Lade ...</div>
+    <Loading v-else />
 </template>

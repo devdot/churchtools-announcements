@@ -16,6 +16,7 @@ import type { AnnouncementSet } from '../../types/Announcement';
 import type { Category, CategoryDataRules } from '../../types/Category';
 import { copyRule, filterRule } from '../../types/Rule';
 import Rule from '../Rule/Rule.vue';
+import Loading from '../Utils/Loading.vue';
 
 const props = defineProps<{ category: Category; categoryId: string | number }>();
 const category = props.category;
@@ -97,7 +98,7 @@ const preview = computed(() =>
                 Speichern
             </button>
             <Rule v-if="rulesLoaded" :key="updateKey" :canEdit="!isSaving" :rule="rules" />
-            <div v-else>Lade Regeln ...</div>
+            <Loading v-else />
         </div>
         <div>
             <div>Vorschau:</div>
@@ -108,7 +109,7 @@ const preview = computed(() =>
                         <th>Datum</th>
                     </tr>
                     <tr v-if="isLoading">
-                        <td colspan="2">Lade Kalender ...</td>
+                        <td colspan="2"><Loading /></td>
                     </tr>
                 </thead>
                 <tbody>

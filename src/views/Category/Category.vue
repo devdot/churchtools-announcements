@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useCategories from '../../composables/useCategories';
+import Loading from '../Utils/Loading.vue';
 const props = defineProps<{
     categoryId: number | string;
 }>();
@@ -8,7 +9,7 @@ const { findCategory, updateCategory, deleteCategory, isLoading } = useCategorie
 const category = findCategory(props.categoryId);
 </script>
 <template>
-    <div v-if="isLoading">Lade Daten</div>
+    <Loading v-if="isLoading" />
     <div v-else-if="category === null">Kategorie nicht gefunden!</div>
     <div v-else class="flex w-full flex-col">
         <h1>

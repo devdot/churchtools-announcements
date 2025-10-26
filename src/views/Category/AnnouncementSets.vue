@@ -4,6 +4,7 @@ import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import type { AnnouncementSet as AnnouncementSetType } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
+import Loading from '../Utils/Loading.vue';
 import AnnouncementSet from './AnnouncementSet.vue';
 import AnnouncementSetsAdmin from './AnnouncementSetsAdmin.vue';
 
@@ -59,5 +60,5 @@ const selectedSet: ComputedRef<AnnouncementSetType | null> = computed(
             :set="selectedSet"
         />
     </div>
-    <div v-else>Lade ...</div>
+    <Loading v-else />
 </template>

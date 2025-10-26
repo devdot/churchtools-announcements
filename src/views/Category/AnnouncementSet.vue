@@ -5,6 +5,7 @@ import useCategory from '../../composables/useCategory';
 import type { AnnouncementSet } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
 import { filterRule } from '../../types/Rule';
+import Loading from '../Utils/Loading.vue';
 import Announcement from './Announcement.vue';
 
 const props = defineProps<{
@@ -39,5 +40,5 @@ const filtered = computed(() =>
             class="py-2"
         />
     </div>
-    <div v-else>Lade Ankündigungen ...</div>
+    <Loading v-else />
 </template>

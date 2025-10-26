@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import type { Category } from '../../types/Category';
+import Loading from '../Utils/Loading.vue';
 import Announcement from './Announcement.vue';
 
 const props = defineProps<{ category: Category; categoryId: string | number }>();
@@ -22,5 +23,5 @@ const { customs, customsLoaded, createCustom } = useAnnouncements(props.category
             :category="props.category"
         />
     </div>
-    <div v-else>Lade Daten ...</div>
+    <Loading v-else />
 </template>

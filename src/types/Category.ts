@@ -1,4 +1,4 @@
-import type { AnnouncementSet } from './Annoucement';
+import type { AnnouncementCustom, AnnouncementSet } from './Announcement';
 import type { Rule } from './Rule';
 
 export interface Category {
@@ -33,6 +33,12 @@ export interface CategoryDataSettings extends CategoryData, CategorySettings {
 
 export interface CategoryDataRules extends CategoryData, Rule {
     type: 'rules';
+}
+
+export interface CategoryDataAnnouncementCustom
+    extends CategoryData,
+        Omit<AnnouncementCustom, 'type'> {
+    type: 'custom';
 }
 
 export interface CategoryDataAnnouncementSet extends CategoryData, AnnouncementSet {

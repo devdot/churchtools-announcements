@@ -2,7 +2,7 @@
 import { format } from 'date-and-time';
 import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
-import type { AnnouncementSet as AnnouncementSetType } from '../../types/Annoucement';
+import type { AnnouncementSet as AnnouncementSetType } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
 import AnnouncementSet from './AnnouncementSet.vue';
 import AnnouncementSetsAdmin from './AnnouncementSetsAdmin.vue';

@@ -1,8 +1,8 @@
 import { churchtoolsClient } from '@churchtools/churchtools-client';
 import { useQuery } from '@tanstack/vue-query';
 import { addDays, format } from 'date-and-time';
-import { computed, type Ref } from 'vue';
-import type { AnnouncementSet } from '../types/Annoucement';
+import { computed, type ComputedRef, type Ref } from 'vue';
+import type { AnnouncementAppointment, AnnouncementSet } from '../types/Announcement';
 import type { Category } from '../types/Category';
 import type { AppointmentCalculatedWithIncludes } from '../utils/ct-types';
 import useCalendars from './useCalendars';
@@ -34,9 +34,11 @@ export default function useAppointments(category: Category, announcementSet: Ref
         enabled: computed(() => settingsLoaded.value && !isLoadingCalendars.value),
     });
 
-    const appointments = computed(() =>
+    const appointments: ComputedRef<AnnouncementAppointment[]> = computed(() =>
         (data.value ?? []).map(appointment =>
-            Object.assign(appointment.appointment.base, appointment.appointment.calculated),
+            Object.assign(appointment.appointment.base, appointment.appointment.calculated, {
+                type: 'appointment',
+            }),
         ),
     );
 

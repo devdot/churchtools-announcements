@@ -1,11 +1,16 @@
 import { format } from 'date-and-time';
 import { computed, type ComputedRef } from 'vue';
-import type { AnnouncementSet } from '../types/Annoucement';
+import type { AnnouncementSet } from '../types/Announcement';
 import type { Category } from '../types/Category';
 import useCategory from './useCategory';
 
 export const useAnnouncements = function (category: Category) {
     const {
+        announcementCustoms: customs,
+        announcementCustomsLoaded: customsLoaded,
+        createAnnouncementCustom: createCustom,
+        updateAnnouncementCustom: updateCustom,
+        deleteAnnouncementCustom: deleteCustom,
         announcementSets: sets,
         announcementSetsLoaded: setsLoaded,
         createAnnouncementSet: createSet,
@@ -24,6 +29,11 @@ export const useAnnouncements = function (category: Category) {
     const getSetByDate = (date: Date) => setsByDate.value.get(getDateString(date)) ?? null;
 
     return {
+        customs,
+        customsLoaded,
+        createCustom,
+        updateCustom,
+        deleteCustom,
         sets,
         setsLoaded,
         getSetByDate,

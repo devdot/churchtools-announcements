@@ -12,7 +12,7 @@ import {
 } from 'vue';
 import useAppointments from '../../composables/useAppointments';
 import useCategory from '../../composables/useCategory';
-import type { AnnouncementSet } from '../../types/Annoucement';
+import type { AnnouncementSet } from '../../types/Announcement';
 import type { Category, CategoryDataRules } from '../../types/Category';
 import { copyRule, filterRule } from '../../types/Rule';
 import Rule from '../Rule/Rule.vue';

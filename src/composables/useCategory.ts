@@ -1,12 +1,18 @@
 import {
     useCustomModuleDataValuesMutations,
     useCustomModuleDataValuesQuery,
+    type ApiError,
+    type CreateDataValue,
+    type CustomModuleDataValue,
+    type UpdateDataValue,
 } from '@churchtools/utils';
+import type { MutateFunction } from '@tanstack/vue-query';
 import { computed, type ComputedRef, type Ref } from 'vue';
-import type { AnnouncementSet } from '../types/Annoucement';
+import type { AnnouncementCustom, AnnouncementSet } from '../types/Announcement';
 import {
     type Category,
     type CategoryData,
+    type CategoryDataAnnouncementCustom,
     type CategoryDataAnnouncementSet,
     type CategoryDataRules,
     type CategoryDataSettings,
@@ -18,12 +24,54 @@ export default function useCategory(category: Category) {
     const { moduleId } = useModule();
     const categoryId = computed(() => category.id);
 
+    // templates for loading data
     const loadData = <T extends CategoryData>() =>
         useCustomModuleDataValuesQuery<T>(moduleId, categoryId);
     const filterData = <T extends CategoryData>(data: Ref<undefined> | Ref<T[]>, type: string) =>
         (data.value ?? []).filter((category: T) => category.type === type);
     const isDataLoaded = (data: Ref<undefined> | Ref<CategoryData[]>) =>
         computed(() => typeof data.value !== 'undefined');
+
+    // templates for mutating data
+    const createValue = <Type extends object, DataType extends CategoryData>(
+        type: DataType['type'],
+        create: MutateFunction<CustomModuleDataValue, ApiError, CreateDataValue<DataType>>,
+    ) => {
+        return (data: Omit<Type, 'id'>) =>
+            create({
+                ...data,
+                dataCategoryId: category.id,
+                id: 0,
+                type: type,
+            });
+    };
+    const updateValue = <Type extends object, DataType extends CategoryData>(
+        type: DataType['type'],
+        update: MutateFunction<CustomModuleDataValue, ApiError, UpdateDataValue<DataType>>,
+    ) => {
+        return (data: Type) =>
+            update({
+                ...data,
+                dataCategoryId: category.id,
+                type: type,
+            });
+    };
+    const deleteValue = <
+        Type extends Pick<CustomModuleDataValue, 'id'>,
+        DataType extends CategoryData,
+    >(
+        del: MutateFunction<
+            unknown,
+            ApiError,
+            Pick<DataType, 'id'> & Pick<CustomModuleDataValue, 'dataCategoryId'>
+        >,
+    ) => {
+        return (data: Type) =>
+            del({
+                ...data,
+                dataCategoryId: category.id,
+            });
+    };
 
     // settings
     const { data: dataSettings } = loadData<CategoryDataSettings>();
@@ -111,7 +159,29 @@ export default function useCategory(category: Category) {
         });
     };
 
-    // announcements
+    // custom announcements
+    const { data: dataAnnouncementCustoms } = loadData<CategoryDataAnnouncementCustom>();
+    const announcementCustoms = computed(() => filterData(dataAnnouncementCustoms, 'custom'));
+    const announcementCustomsLoaded = isDataLoaded(announcementCustoms);
+    const {
+        createCustomDataValue: createAnnouncementCustomValue,
+        updateCustomDataValue: updateAnnouncementCustomValue,
+        deleteCustomDataValue: deleteAnnouncementCustomValue,
+    } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementCustom>(moduleId, categoryId);
+    const createAnnouncementCustom = createValue<
+        AnnouncementCustom,
+        CategoryDataAnnouncementCustom
+    >('custom', createAnnouncementCustomValue);
+    const updateAnnouncementCustom = updateValue<
+        AnnouncementCustom,
+        CategoryDataAnnouncementCustom
+    >('custom', updateAnnouncementCustomValue);
+    const deleteAnnouncementCustom = deleteValue<
+        AnnouncementCustom,
+        CategoryDataAnnouncementCustom
+    >(deleteAnnouncementCustomValue);
+
+    // announcement sets
     const { data: dataAnnouncementSets } = loadData<CategoryDataAnnouncementSet>();
     const announcementSets = computed(() =>
         filterData(dataAnnouncementSets, 'set')
@@ -127,27 +197,18 @@ export default function useCategory(category: Category) {
         updateCustomDataValue: updateAnnouncementSetValue,
         deleteCustomDataValue: deleteAnnouncementSetValue,
     } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementSet>(moduleId, categoryId);
-    const createAnnouncementSet = (set: Omit<AnnouncementSet, 'id'>) => {
-        return createAnnouncementSetValue({
-            dataCategoryId: category.id,
-            id: 0,
-            type: 'set',
-            ...set,
-        });
-    };
-    const updateAnnouncementSet = (set: AnnouncementSet) => {
-        return updateAnnouncementSetValue({
-            dataCategoryId: category.id,
-            type: 'set',
-            ...set,
-        });
-    };
-    const deleteAnnouncementSet = (set: AnnouncementSet) => {
-        return deleteAnnouncementSetValue({
-            dataCategoryId: category.id,
-            ...set,
-        });
-    };
+
+    const createAnnouncementSet = createValue<AnnouncementSet, CategoryDataAnnouncementSet>(
+        'set',
+        createAnnouncementSetValue,
+    );
+    const updateAnnouncementSet = updateValue<AnnouncementSet, CategoryDataAnnouncementSet>(
+        'set',
+        updateAnnouncementSetValue,
+    );
+    const deleteAnnouncementSet = deleteValue<AnnouncementSet, CategoryDataAnnouncementSet>(
+        deleteAnnouncementSetValue,
+    );
 
     return {
         settings,
@@ -157,6 +218,11 @@ export default function useCategory(category: Category) {
         rulesLoaded,
         updateRules,
         rulesUpdatedAt,
+        announcementCustoms,
+        announcementCustomsLoaded,
+        createAnnouncementCustom,
+        updateAnnouncementCustom,
+        deleteAnnouncementCustom,
         announcementSets,
         announcementSetsLoaded,
         createAnnouncementSet,

@@ -40,14 +40,19 @@ app.use(VueQueryPlugin);
 const username = import.meta.env.VITE_USERNAME;
 const password = import.meta.env.VITE_PASSWORD;
 if (import.meta.env.MODE === 'development' && username && password) {
-    await churchtoolsClient.get('/whoami').then(whoami => {
-        if (whoami.id > 0) console.log('Logged in as #' + whoami.id);
-        else
-            churchtoolsClient.post('/login', {
-                username,
-                password,
-            });
-    });
+    const login = () =>
+        churchtoolsClient.post('/login', {
+            username,
+            password,
+        });
+
+    await churchtoolsClient
+        .get('/whoami')
+        .then(whoami => {
+            if (whoami.id > 0) console.log('Logged in as #' + whoami.id);
+            else return login();
+        })
+        .catch(login);
 }
 
 const KEY = import.meta.env.VITE_KEY;

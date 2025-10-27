@@ -21,7 +21,7 @@ const props = defineProps<{ category: Category; settings: CategoryDataSettings }
 const category = ref(JSON.parse(JSON.stringify(props.category)));
 const settings = ref(JSON.parse(JSON.stringify(props.settings)));
 const { updateCategory, deleteCategory } = useCategories();
-const { updateSettings } = useCategory(props.category);
+const { updateSettings, can } = useCategory(props.category);
 
 const { calendars, isLoading: calendarsLoading } = useCalendars();
 
@@ -64,6 +64,7 @@ const del = function () {
             <div>
                 <Button
                     v-if="confirmDelete"
+                    :disabled="!can.delete"
                     icon="fa-solid fa-trash"
                     label="Bestätigen"
                     :severity="'danger'"
@@ -71,6 +72,7 @@ const del = function () {
                 />
                 <Button
                     v-else
+                    :disabled="!can.delete"
                     icon="fa-solid fa-trash"
                     label="Löschen"
                     outlined
@@ -86,6 +88,7 @@ const del = function () {
                         <InputText
                             id="name"
                             v-model="category.name"
+                            :disabled="!can.edit"
                             fluid
                             size="large"
                             type="text"
@@ -108,13 +111,18 @@ const del = function () {
                         <Textarea
                             id="description"
                             v-model="category.description"
+                            :disabled="!can.edit"
                             fluid
                             :rows="6"
                             @update:model-value="dirtyHeader = true"
                         />
                         <label for="description">Beschreibung</label>
                     </FloatLabel>
-                    <Button :disabled="!dirtyHeader" fluid :severity="'success'" @click="saveHeader"
+                    <Button
+                        :disabled="!dirtyHeader || !can.edit"
+                        fluid
+                        :severity="'success'"
+                        @click="saveHeader"
                         >Speichern</Button
                     >
                 </div>
@@ -127,6 +135,7 @@ const del = function () {
                         <MultiSelect
                             id="calendarIds"
                             v-model="settings.calendarIds"
+                            :disabled="!can.upsertData"
                             display="chip"
                             fluid
                             :loading="calendarsLoading"
@@ -143,6 +152,7 @@ const del = function () {
                         <InputNumber
                             id="cutoffDays"
                             v-model="settings.cutoffDays"
+                            :disabled="!can.upsertData"
                             fluid
                             :max="720"
                             :min="0"
@@ -157,6 +167,7 @@ const del = function () {
                         <InputNumber
                             id="pruneDays"
                             v-model="settings.pruneDays"
+                            :disabled="!can.upsertData"
                             fluid
                             :max="365"
                             :min="0"
@@ -172,6 +183,7 @@ const del = function () {
                         <Select
                             id="eventCalendarId"
                             v-model="settings.eventCalendarId"
+                            :disabled="!can.upsertData"
                             fluid
                             :loading="calendarsLoading"
                             option-label="name"
@@ -187,6 +199,7 @@ const del = function () {
                         <Select
                             id="interval.type"
                             v-model="settings.interval.type"
+                            :disabled="!can.upsertData"
                             fluid
                             option-label="name"
                             option-value="value"
@@ -200,6 +213,7 @@ const del = function () {
                         <InputNumber
                             id="interval.day"
                             v-model="settings.interval.day"
+                            :disabled="!can.upsertData"
                             fluid
                             :max="settings.interval.type === 'week' ? 6 : 31"
                             :min="settings.interval.type === 'week' ? 0 : 1"
@@ -214,7 +228,11 @@ const del = function () {
                             >Monatstag</label
                         >
                     </FloatLabel>
-                    <Button :disabled="!dirtyMain" fluid :severity="'success'" @click="saveMain"
+                    <Button
+                        :disabled="!dirtyMain || !can.upsertData"
+                        fluid
+                        :severity="'success'"
+                        @click="saveMain"
                         >Speichern</Button
                     >
                 </div>

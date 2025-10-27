@@ -59,20 +59,13 @@ const bg = computed(() => {
             </div>
             <div class="flex justify-center divide-x divide-gray-500 border-l border-gray-500">
                 <button
-                    v-if="rule.negate"
-                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    class="p-2 not-disabled:cursor-pointer not-disabled:hover:bg-gray-200"
+                    :disabled="!canEdit"
                     title="Regel negieren"
-                    @click="rule.negate = false"
+                    @click="rule.negate = !rule.negate"
                 >
-                    <i class="fa-solid fa-not-equal"></i>
-                </button>
-                <button
-                    v-else
-                    class="cursor-pointer p-2 hover:bg-gray-200"
-                    title="Regel negieren"
-                    @click="rule.negate = true"
-                >
-                    <i class="fa-solid fa-equals"></i>
+                    <i v-if="rule.negate" class="fa-solid fa-not-equal"></i>
+                    <i v-else class="fa-solid fa-equals"></i>
                 </button>
                 <button
                     v-if="canDelete && !deleteConfirm"

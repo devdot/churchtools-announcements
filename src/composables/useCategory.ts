@@ -21,10 +21,13 @@ import {
 } from '../types/Category';
 import { addRule, ruleFactory, type Rule } from '../types/Rule';
 import useModule from './useModule';
+import { usePermissions } from './usePermissions';
 
 export default function useCategory(category: Category) {
     const { moduleId } = useModule();
     const categoryId = computed(() => category.id);
+    const { can: canFn } = usePermissions();
+    const can = canFn(category.id);
 
     // templates for loading data
     const loadData = <T extends CategoryData>() =>
@@ -212,6 +215,7 @@ export default function useCategory(category: Category) {
     );
 
     return {
+        can,
         settings,
         settingsLoaded,
         updateSettings,

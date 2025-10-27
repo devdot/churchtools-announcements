@@ -2,9 +2,11 @@
 import { Button, Card, Dialog } from 'primevue';
 import { ref } from 'vue';
 import useCategories from '../composables/useCategories';
+import { usePermissions } from '../composables/usePermissions';
 import CategoryCreate from './Category/CategoryCreate.vue';
 import Layout from './Layout.vue';
 
+const { canCreateCategory } = usePermissions();
 const { categories } = useCategories();
 const create = ref(false);
 </script>
@@ -31,6 +33,7 @@ const create = ref(false);
         <template #header-title>Ankündigungen</template>
         <template #header-buttons>
             <Button
+                v-if="canCreateCategory"
                 icon="fa-solid fa-plus"
                 label="Neue Kategorie"
                 severity="secondary"

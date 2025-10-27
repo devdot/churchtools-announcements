@@ -23,7 +23,7 @@ import Loading from '../Utils/Loading.vue';
 const props = defineProps<{ category: Category; categoryId: string | number }>();
 const category = props.category;
 
-const { updateRules, rules: storageRules, rulesLoaded } = useCategory(category);
+const { updateRules, rules: storageRules, rulesLoaded, can } = useCategory(category);
 const rules: Reactive<CategoryDataRules> = reactive(structuredClone(toRaw(storageRules.value)));
 const updateKey: Ref<number> = ref(0);
 
@@ -92,13 +92,18 @@ const update = function () {};
         <div class="space-y-6">
             <h1 class="text-display-m">Kalender-Filter</h1>
             <Button
-                :disabled="!(isChanged || rules.id === 0) && !isSaving"
+                :disabled="!(isChanged || rules.id === 0) && !isSaving && can.upsertData"
                 fluid
                 label="Speichern"
                 size="small"
                 @click="save"
             />
-            <Rule v-if="rulesLoaded" :key="updateKey" :canEdit="!isSaving" :rule="rules" />
+            <Rule
+                v-if="rulesLoaded"
+                :key="updateKey"
+                :canEdit="!isSaving && can.upsertData"
+                :rule="rules"
+            />
             <Loading v-else />
         </div>
         <div class="space-y-6">

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatDate } from '@churchtools/utils';
+import { Button, Card } from 'primevue';
 import {
     computed,
     onBeforeUnmount,
@@ -21,7 +23,7 @@ import Loading from '../Utils/Loading.vue';
 const props = defineProps<{ category: Category; categoryId: string | number }>();
 const category = props.category;
 
-const { updateRules, rules: storageRules, rulesLoaded, rulesUpdatedAt } = useCategory(category);
+const { updateRules, rules: storageRules, rulesLoaded } = useCategory(category);
 const rules: Reactive<CategoryDataRules> = reactive(structuredClone(toRaw(storageRules.value)));
 const updateKey: Ref<number> = ref(0);
 
@@ -81,47 +83,51 @@ const { appointments, isLoading } = useAppointments(category, announcement);
 const preview = computed(() =>
     appointments.value.filter(appointment => filterRule(rules, appointment)),
 );
+
+const update = function () {};
 </script>
 
 <template>
-    <h1>Regeln</h1>
-    <div>storage: {{ storageRules.id }} editor: {{ rules.id }} key: {{ updateKey }}</div>
-    {{ JSON.stringify(rules) }}
-    <div class="text-gray-700 italic">Zuletzt geladen: {{ new Date(rulesUpdatedAt) }}</div>
     <div class="grid w-full grid-cols-2 gap-8">
-        <div>
-            <button
-                class="cursor-pointer rounded-md bg-blue-400 p-2 disabled:bg-gray-400"
+        <div class="space-y-6">
+            <h1 class="text-display-m">Kalender-Filter</h1>
+            <Button
                 :disabled="!(isChanged || rules.id === 0) && !isSaving"
+                fluid
+                label="Speichern"
+                size="small"
                 @click="save"
-            >
-                Speichern
-            </button>
+            />
             <Rule v-if="rulesLoaded" :key="updateKey" :canEdit="!isSaving" :rule="rules" />
             <Loading v-else />
         </div>
-        <div>
-            <div>Vorschau:</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Titel</th>
-                        <th>Datum</th>
-                    </tr>
-                    <tr v-if="isLoading">
-                        <td colspan="2"><Loading /></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="appointment in preview"
-                        :key="appointment.id + appointment.startDate"
-                    >
-                        <td>{{ appointment.title }}</td>
-                        <td>{{ appointment.startDate }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="space-y-6">
+            <h1 class="text-display-m mb-6">Vorschau</h1>
+            <Button fluid label="Aktualisieren" severity="info" size="small" @click="update" />
+            <Card>
+                <template #content>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b">
+                                <td class="font-bold">Titel</td>
+                                <td class="font-bold">Datum</td>
+                            </tr>
+                            <tr v-if="isLoading">
+                                <td colspan="2"><Loading /></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="appointment in preview"
+                                :key="appointment.id + appointment.startDate"
+                            >
+                                <td class="pr-2">{{ appointment.title }}</td>
+                                <td>{{ formatDate(new Date(appointment.startDate), true) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
+            </Card>
         </div>
     </div>
 </template>

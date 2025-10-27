@@ -11,7 +11,7 @@ const create = ref(false);
 <template>
     <Layout>
         <template #main>
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div class="max-w-content mx-auto grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <RouterLink
                     v-for="category in categories"
                     :key="category.id"
@@ -30,7 +30,12 @@ const create = ref(false);
         </template>
         <template #header-title>Ankündigungen</template>
         <template #header-buttons>
-            <Button severity="secondary" @click="create = !create">Neue Kategorie</Button>
+            <Button
+                icon="fa-solid fa-plus"
+                label="Neue Kategorie"
+                severity="secondary"
+                @click="create = !create"
+            />
         </template>
     </Layout>
 </template>

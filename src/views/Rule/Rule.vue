@@ -34,6 +34,8 @@ const filter = computed(() => filters[rule.filter.type ?? ''] ?? Generic);
 
 const collapsed = ref(false);
 
+const deleteConfirm = ref(false);
+
 const bg = computed(() => {
     switch (props.level) {
         case 0:
@@ -51,19 +53,51 @@ const bg = computed(() => {
 </script>
 <template>
     <div class="rounded-md border border-gray-500 shadow-md">
-        <div class="flex rounded-t-md border-b border-gray-500 bg-white p-2">
-            <div class="grow">
+        <div class="flex rounded-t-md border-b border-gray-500 bg-white">
+            <div class="grow p-2">
                 {{ header }}
             </div>
-            <div class="flex gap-2">
-                <div>
-                    <input v-model="rule.negate" :disabled="!props.canEdit" type="checkbox" />
-                    <span v-if="rule.negate">◐</span>
-                    <span v-else>◑</span>
+            <div class="flex justify-center divide-x divide-gray-500 border-l border-gray-500">
+                <button
+                    v-if="rule.negate"
+                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    title="Regel negieren"
+                    @click="rule.negate = false"
+                >
+                    <i class="fa-solid fa-not-equal"></i>
+                </button>
+                <button
+                    v-else
+                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    title="Regel negieren"
+                    @click="rule.negate = true"
+                >
+                    <i class="fa-solid fa-equals"></i>
+                </button>
+                <button
+                    v-if="canDelete && !deleteConfirm"
+                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    @click="deleteConfirm = true"
+                >
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+                <button
+                    v-if="canDelete && deleteConfirm"
+                    class="cursor-pointer p-2 text-red-500 hover:bg-gray-200"
+                    @click="emits('deletedRule')"
+                >
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                <div
+                    v-if="collapsed"
+                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    @click="collapsed = false"
+                >
+                    <i class="fa-solid fa-chevron-down"></i>
                 </div>
-                <div v-if="canDelete" class="cursor-pointer" @click="emits('deletedRule')">🗑</div>
-                <div v-if="collapsed" class="cursor-pointer" @click="collapsed = false">▼</div>
-                <div v-else class="cursor-pointer" @click="collapsed = true">▲</div>
+                <div v-else class="cursor-pointer p-2 hover:bg-gray-200" @click="collapsed = true">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </div>
             </div>
         </div>
         <component

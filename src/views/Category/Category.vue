@@ -12,10 +12,10 @@ const { findCategory, isLoading } = useCategories();
 const category = findCategory(props.categoryId);
 
 const menu = ref([
-    { route: 'category', label: 'Ankündigungen', icon: '' },
-    { route: 'category.customs', label: 'Ansagen', icon: '' },
-    { route: 'category.rules', label: 'Kalender-Filter', icon: '' },
-    { route: 'category.settings', label: 'Einstellungen', icon: '' },
+    { route: 'category', label: 'Ankündigungen', icon: 'fa-solid fa-scroll' },
+    { route: 'category.customs', label: 'Ansagen', icon: 'fa-solid fa-bullhorn' },
+    { route: 'category.rules', label: 'Kalender-Filter', icon: 'fa-solid fa-filter' },
+    { route: 'category.settings', label: 'Einstellungen', icon: 'fa-solid fa-gear' },
 ]);
 </script>
 <template>

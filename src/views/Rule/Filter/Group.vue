@@ -73,13 +73,10 @@ const connectBg = computed(() => {
                 :class="[vertical ? 'ml-4 h-2 w-0.5' : 'mt-4 h-0.5 w-2', connectBg]"
             ></div>
             <button
-                :class="[
-                    connectBg,
-                    'h-8 w-8 cursor-pointer rounded-full text-center text-xl text-white',
-                ]"
+                :class="[connectBg, 'h-8 w-8 cursor-pointer rounded-full text-center text-white']"
                 @click="createRule()"
             >
-                +
+                <i class="fa-solid fa-plus"></i>
             </button>
         </div>
     </div>

@@ -58,14 +58,25 @@ const del = function () {
 };
 </script>
 <template>
-    <div class="space-y-5">
+    <div class="max-w-content mx-auto space-y-5">
         <div class="flex justify-between">
             <h1 class="text-display-m">Einstellungen</h1>
             <div>
-                <Button v-if="confirmDelete" :severity="'danger'" @click="del">Bestätigen</Button>
-                <Button v-else outlined :severity="'danger'" @click="confirmDelete = true"
-                    >Löschen</Button
-                >
+                <Button
+                    v-if="confirmDelete"
+                    icon="fa-solid fa-trash"
+                    label="Bestätigen"
+                    :severity="'danger'"
+                    @click="del"
+                />
+                <Button
+                    v-else
+                    icon="fa-solid fa-trash"
+                    label="Löschen"
+                    outlined
+                    :severity="'danger'"
+                    @click="confirmDelete = true"
+                />
             </div>
         </div>
         <Card>

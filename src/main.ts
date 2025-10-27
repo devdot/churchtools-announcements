@@ -1,16 +1,21 @@
 import { churchtoolsClient } from '@churchtools/churchtools-client';
 // import { ctStyleguide } from '@churchtools/styleguide';
 import { ctUtils } from '@churchtools/utils';
+import Lara from '@primeuix/themes/lara';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { createPinia } from 'pinia';
+import PrimeVue from 'primevue/config';
 import { createApp } from 'vue';
 import App from './App.vue';
 import { router } from './router';
+import type { Person } from './utils/ct-types';
 
 // only import reset.css in development mode to keep the production bundle small and to simulate CT environment
 if (import.meta.env.MODE === 'development') {
     import('./utils/tailwind.css');
     import('./utils/reset.css');
+    document.body.innerHTML +=
+        '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />';
 }
 
 declare const window: Window &
@@ -36,6 +41,14 @@ app.use(ctUtils, {
 });
 // app.use(ctStyleguide, { baseUrl, t: t });
 app.use(VueQueryPlugin);
+app.use(PrimeVue, {
+    theme: {
+        preset: Lara,
+        options: {
+            darkModeSelector: 'system',
+        },
+    },
+});
 
 const username = import.meta.env.VITE_USERNAME;
 const password = import.meta.env.VITE_PASSWORD;
@@ -47,7 +60,7 @@ if (import.meta.env.MODE === 'development' && username && password) {
         });
 
     await churchtoolsClient
-        .get('/whoami')
+        .get<Person>('/whoami')
         .then(whoami => {
             if (whoami.id > 0) console.log('Logged in as #' + whoami.id);
             else return login();

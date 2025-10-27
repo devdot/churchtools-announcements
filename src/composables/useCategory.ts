@@ -2,10 +2,12 @@ import {
     useCustomModuleDataValuesMutations,
     useCustomModuleDataValuesQuery,
     type ApiError,
-    type CreateDataValue,
     type CustomModuleDataValue,
-    type UpdateDataValue,
 } from '@churchtools/utils';
+import type {
+    CreateDataValue,
+    UpdateDataValue,
+} from '@churchtools/utils/types/custommodule/useCustomModuleDataValuesMutations';
 import type { MutateFunction } from '@tanstack/vue-query';
 import { computed, type ComputedRef, type Ref } from 'vue';
 import type { AnnouncementCustom, AnnouncementSet } from '../types/Announcement';
@@ -78,7 +80,6 @@ export default function useCategory(category: Category) {
     const defaultSettings: CategoryDataSettings = {
         id: 0,
         type: 'settings',
-        description: '',
         cutoffDays: 180,
         calendarIds: [-1],
         interval: {

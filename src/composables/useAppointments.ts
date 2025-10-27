@@ -37,7 +37,7 @@ export default function useAppointments(category: Category, announcementSet: Ref
     const appointments: ComputedRef<AnnouncementAppointment[]> = computed(() =>
         (data.value ?? []).map(appointment =>
             Object.assign(appointment.appointment.base, appointment.appointment.calculated, {
-                type: 'appointment',
+                type: 'appointment', // note: for some reason TS recognizes this as generic string and therefore fails to match types for the entire array
             }),
         ),
     );

@@ -16,7 +16,6 @@ export interface CategoryData {
 }
 
 export interface CategorySettings {
-    description: string;
     cutoffDays: number; // look-ahead number of days
     calendarIds: number[]; // input calendars
     interval: {

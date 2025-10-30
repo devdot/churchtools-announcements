@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { formatDate } from '@churchtools/utils';
-import { Button, Card } from 'primevue';
+import { Button, Card, DatePicker, InputGroup } from 'primevue';
 import {
     computed,
     onBeforeUnmount,
@@ -88,7 +88,7 @@ const update = function () {};
 </script>
 
 <template>
-    <div class="grid w-full grid-cols-2 gap-8">
+    <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
         <div class="space-y-6">
             <h1 class="text-display-m">Kalender-Filter</h1>
             <Button
@@ -108,7 +108,21 @@ const update = function () {};
         </div>
         <div class="space-y-6">
             <h1 class="text-display-m mb-6">Vorschau</h1>
-            <Button fluid label="Aktualisieren" severity="info" size="small" @click="update" />
+            <InputGroup>
+                <Button
+                    class="grow"
+                    label="Aktualisieren"
+                    severity="info"
+                    size="small"
+                    @click="update"
+                />
+                <DatePicker
+                    v-model="announcement.date"
+                    dateFormat="yy-mm-dd"
+                    showIcon
+                    size="small"
+                />
+            </InputGroup>
             <Card>
                 <template #content>
                     <table class="w-full">

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { churchtoolsClient } from '@churchtools/churchtools-client';
 import { useQuery } from '@tanstack/vue-query';
-import { addDays, addMonths } from 'date-and-time';
-import { computed, type ComputedRef } from 'vue';
+import { addDays, addMonths, format } from 'date-and-time';
+import { Button, ButtonGroup, DatePicker, InputNumber, InputText } from 'primevue';
+import { computed, ref, type ComputedRef, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import useCategory from '../../composables/useCategory';
 import type { Category, CategoryDataAnnouncementSet } from '../../types/Category';
@@ -100,7 +101,9 @@ const generateableSets = computed(function () {
 });
 
 const existingSets = computed(function () {
-    return expectedSets.value.filter(set => getSetByDate(set.date) !== null);
+    return sets.value.filter(
+        set => (prunableSets.value.find(prune => prune.id === set.id) ?? null) === null,
+    );
 });
 
 const prunableSets = computed(function () {
@@ -127,34 +130,121 @@ const prune = async function () {
     // delete them all
     return Promise.all(prunableSets.value.map(deleteSet));
 };
+
+const showAdd = ref(false);
+const addSet: Ref<Omit<CategoryDataAnnouncementSet, 'id' | 'type'>> = ref({
+    title: '',
+    date: new Date(),
+    eventId: null,
+});
 </script>
 <template>
-    <div v-if="setsLoaded" class="border">
-        <div class="flex gap-2">
-            <button @click="generate">Generieren</button>
-            <button @click="prune">Alte Löschen</button>
+    <div v-if="setsLoaded" class="space-y-6">
+        <div class="leading-6">
+            <div class="grid grid-cols-4 gap-1 border-b font-bold">
+                <div>Datum</div>
+                <div>Titel</div>
+                <div>Status</div>
+                <div>Event</div>
+            </div>
+            <div
+                v-for="set in totalSets"
+                :key="getDateString(set.date) + set.eventId"
+                class="grid grid-cols-4 gap-1 even:bg-gray-100"
+            >
+                <div>{{ format(set.date, 'DD.MM.YYYY') }}</div>
+                <div>{{ set.title }}</div>
+                <div class="flex justify-between">
+                    <span
+                        :class="
+                            set.status === 'prune'
+                                ? 'text-red-500'
+                                : set.status === 'generate'
+                                  ? 'text-green-500'
+                                  : 'text-blue-500'
+                        "
+                        >{{
+                            set.status === 'prune'
+                                ? 'löschen'
+                                : set.status === 'generate'
+                                  ? 'erzeugen'
+                                  : 'existiert'
+                        }}</span
+                    >
+                    <span class="cursor-pointer text-xs">
+                        <i
+                            v-if="set.status !== 'generate'"
+                            class="fa-solid fa-trash hover:text-red-500"
+                            @click="deleteSet(set)"
+                        ></i>
+                        <i
+                            v-else
+                            class="fa-solid fa-plus hover:text-green-500"
+                            @click="createSet(set)"
+                        ></i>
+                    </span>
+                </div>
+                <div>
+                    <a
+                        v-if="set.eventId"
+                        class="hover:underline"
+                        :href="'?q=churchservice&id=' + set.eventId"
+                        >Event #{{ set.eventId }}</a
+                    >
+                    <span v-else class="italic">ohne</span>
+                </div>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Datum</th>
-                    <th>Titel</th>
-                    <th>Status</th>
-                    <th>Event</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="set in totalSets" :key="getDateString(set.date) + set.eventId">
-                    <td>{{ getDateString(set.date) }}</td>
-                    <td>{{ set.title }}</td>
-                    <td>{{ set.status }}</td>
-                    <td>
-                        <a v-if="set.eventId" :href="'?q=churchservice&id=' + set.eventId">Event</a>
-                        <span v-else class="italic">ohne</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <ButtonGroup>
+            <Button
+                :badge="generateableSets.length + ''"
+                :disabled="generateableSets.length === 0"
+                icon="fa-solid fa-square-plus"
+                label="Erzeugen"
+                outlined
+                @click="generate"
+            />
+            <Button
+                :badge="prunableSets.length + ''"
+                :disabled="prunableSets.length === 0"
+                icon="fa-solid fa-trash"
+                label="Löschen"
+                outlined
+                severity="danger"
+                @click="prune"
+            />
+            <Button
+                icon="fa-solid fa-plus"
+                label="Manuell"
+                outlined
+                severity="info"
+                @click="showAdd = true"
+            />
+        </ButtonGroup>
+        <div v-if="showAdd" class="space-y-2">
+            <DatePicker
+                v-model="addSet.date"
+                dateFormat="dd.mm.yy"
+                fluid
+                placeholder="Datum"
+                size="small"
+            />
+            <InputText v-model="addSet.title" fluid placeholder="Titel" size="small" />
+            <InputNumber
+                v-model="addSet.eventId"
+                fluid
+                :min="1"
+                placeholder="Event ID"
+                showClear
+                size="small"
+            />
+            <Button
+                :disabled="addSet.title === ''"
+                fluid
+                label="Hinzufügen"
+                @click="createSet(addSet)"
+            />
+        </div>
     </div>
     <Loading v-else />
 </template>

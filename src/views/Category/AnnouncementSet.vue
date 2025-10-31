@@ -17,10 +17,10 @@ const props = defineProps<{
 }>();
 
 const { appointments, isLoading } = useAppointments(props.category, ref(props.set));
-const { rules, rulesLoaded } = useCategory(props.category);
+const { rules, rulesLoaded, announcementOptionsLoaded } = useCategory(props.category);
 const { filterOptions, customs } = useAnnouncements(props.category);
 
-const isLoaded = computed(() => !isLoading.value && rulesLoaded);
+const isLoaded = computed(() => !isLoading.value && rulesLoaded && announcementOptionsLoaded);
 const filteredAppointments = computed(() =>
     appointments.value.filter(
         appointment =>

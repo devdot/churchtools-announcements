@@ -12,7 +12,7 @@ import useCategory from './useCategory';
 export default function useAppointments(category: Category, announcementSet: Ref<AnnouncementSet>) {
     const { settings, settingsLoaded } = useCategory(category);
     const { calendars, calendarIds, isLoading: isLoadingCalendars } = useCalendars();
-    const { findOptions, generateOptions } = useAnnouncements(category);
+    const { findOptions, generateOptions, optionsLoaded } = useAnnouncements(category);
 
     const { data, isLoading } = useQuery<AppointmentCalculatedWithIncludes[]>({
         queryKey: ['appointments', calendarIds, settings, announcementSet],
@@ -33,16 +33,23 @@ export default function useAppointments(category: Category, announcementSet: Ref
             });
         },
         staleTime: 1000 * 60, // 1 minute
-        enabled: computed(() => settingsLoaded.value && !isLoadingCalendars.value),
+        enabled: computed(
+            () => settingsLoaded.value && !isLoadingCalendars.value && optionsLoaded.value,
+        ),
     });
 
     const appointments: ComputedRef<AnnouncementAppointment[]> = computed(() =>
-        (data.value ?? []).map(appointment =>
-            Object.assign(appointment.appointment.base, appointment.appointment.calculated, {
-                type: 'appointment', // note: for some reason TS recognizes this as generic string and therefore fails to match types for the entire array
-                options: toRaw(findOptions(appointment.appointment.base)) ?? generateOptions(),
-            }),
-        ),
+        (data.value ?? []).map(function (appointment) {
+            const a: AnnouncementAppointment = Object.assign(
+                appointment.appointment.base,
+                appointment.appointment.calculated,
+                {
+                    type: 'appointment', // note: for some reason TS recognizes this as generic string and therefore fails to match types for the entire array
+                },
+            );
+            a.options = toRaw(findOptions(a).value) ?? generateOptions();
+            return a;
+        }),
     );
 
     return {

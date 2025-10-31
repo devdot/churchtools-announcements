@@ -1,5 +1,5 @@
 import { addDays, format, isSameDay } from 'date-and-time';
-import { computed, type ComputedRef } from 'vue';
+import { computed, unref, type ComputedRef, type MaybeRef } from 'vue';
 import type {
     Announcement,
     AnnouncementAppointment,
@@ -60,9 +60,10 @@ export const useAnnouncements = function (category: Category) {
     const defaultOptionsJson = JSON.stringify(defaultOptions);
 
     const findOptions = function (
-        appointment: AppointmentBase,
-    ): CategoryDataAnnouncementOptions | null {
-        return optionsMap.value.get(appointment.id + '_' + appointment.startDate) ?? null;
+        appointment: MaybeRef<AppointmentBase>,
+    ): ComputedRef<CategoryDataAnnouncementOptions | null> {
+        const a = unref(appointment);
+        return computed(() => optionsMap.value.get(a.id + '_' + a.startDate) ?? null);
     };
 
     const generateOptions = (options: Partial<AnnouncementOptions> = {}) =>
@@ -73,7 +74,7 @@ export const useAnnouncements = function (category: Category) {
 
     const storeOptions = function (appointment: AnnouncementAppointment) {
         if (typeof appointment.options === 'undefined') {
-            const options = findOptions(appointment);
+            const options = findOptions(appointment).value;
             if (options) {
                 return deleteOptions(options);
             }
@@ -82,6 +83,7 @@ export const useAnnouncements = function (category: Category) {
 
         // check if the options are the same as default options and if so, delete record
         if (JSON.stringify(appointment.options) === defaultOptionsJson) {
+            // todo: this does not work as intended
             return deleteOptions(appointment.options);
         }
 

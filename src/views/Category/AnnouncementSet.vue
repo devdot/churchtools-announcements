@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { ToggleSwitch } from 'primevue';
 import { computed, ref } from 'vue';
+import { useAnnouncements } from '../../composables/useAnnouncements';
 import useAppointments from '../../composables/useAppointments';
 import useCategory from '../../composables/useCategory';
+import { usePermissions } from '../../composables/usePermissions';
 import type { AnnouncementSet } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
 import { filterRule } from '../../types/Rule';
@@ -14,28 +17,51 @@ const props = defineProps<{
 }>();
 
 const { appointments, isLoading } = useAppointments(props.category, ref(props.set));
-const { rules, rulesLoaded, announcementCustoms } = useCategory(props.category);
+const { rules, rulesLoaded } = useCategory(props.category);
+const { filterOptions, customs } = useAnnouncements(props.category);
 
 const isLoaded = computed(() => !isLoading.value && rulesLoaded);
-const filtered = computed(() =>
-    appointments.value.filter(appointment => filterRule(rules.value, appointment)),
+const filteredAppointments = computed(() =>
+    appointments.value.filter(
+        appointment =>
+            filterRule(rules.value, appointment) &&
+            (disableOptionsFilter.value || filterOptions(appointment, props.set)),
+    ),
 );
+const filteredCustoms = computed(() =>
+    disableOptionsFilter.value
+        ? customs.value
+        : customs.value.filter(custom => filterOptions(custom, props.set)),
+);
+
+const disableOptionsFilter = ref(false);
+
+const { can: canFn } = usePermissions();
+const can = canFn(props.category);
 </script>
 <template>
     <div v-if="isLoaded" class="divide-y divide-gray-200">
+        <div class="flex gap-4">
+            <div v-if="category.description !== ''" class="grow pt-2 pb-4">
+                {{ category.description }}
+            </div>
+            <div>
+                <ToggleSwitch v-model="disableOptionsFilter" title="versteckte anzeigen" />
+            </div>
+        </div>
         <Announcement
-            v-for="custom in announcementCustoms"
+            v-for="custom in filteredCustoms"
             :key="custom.id"
             :announcement="custom"
-            :canEdit="false"
+            :canEdit="can.editData"
             :category="props.category"
             class="py-2"
         />
         <Announcement
-            v-for="appointment in filtered"
+            v-for="appointment in filteredAppointments"
             :key="appointment.id + appointment.startDate"
             :announcement="appointment"
-            :canEdit="false"
+            :canEdit="can.editData"
             :category="props.category"
             class="py-2"
         />

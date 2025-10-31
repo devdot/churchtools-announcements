@@ -10,11 +10,16 @@ import type {
 } from '@churchtools/utils/types/custommodule/useCustomModuleDataValuesMutations';
 import type { MutateFunction } from '@tanstack/vue-query';
 import { computed, type ComputedRef, type Ref } from 'vue';
-import type { AnnouncementCustom, AnnouncementSet } from '../types/Announcement';
+import type {
+    AnnouncementCustom,
+    AnnouncementOptions,
+    AnnouncementSet,
+} from '../types/Announcement';
 import {
     type Category,
     type CategoryData,
     type CategoryDataAnnouncementCustom,
+    type CategoryDataAnnouncementOptions,
     type CategoryDataAnnouncementSet,
     type CategoryDataRules,
     type CategoryDataSettings,
@@ -185,6 +190,28 @@ export default function useCategory(category: Category) {
         CategoryDataAnnouncementCustom
     >(deleteAnnouncementCustomValue);
 
+    // announcement options (for appointments)
+    const { data: dataAnnouncementOptions } = loadData<CategoryDataAnnouncementOptions>();
+    const announcementOptions = computed(() => filterData(dataAnnouncementOptions, 'a_options'));
+    const announcementOptionsLoaded = isDataLoaded(announcementOptions);
+    const {
+        createCustomDataValue: createAnnouncementOptionValue,
+        updateCustomDataValue: updateAnnouncementOptionValue,
+        deleteCustomDataValue: deleteAnnouncementOptionValue,
+    } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementOptions>(moduleId, categoryId);
+    const createAnnouncementOptions = createValue<
+        Omit<CategoryDataAnnouncementOptions, 'type'>,
+        CategoryDataAnnouncementOptions
+    >('a_options', createAnnouncementOptionValue);
+    const updateAnnouncementOptions = updateValue<
+        Omit<CategoryDataAnnouncementOptions, 'type'>,
+        CategoryDataAnnouncementOptions
+    >('a_options', updateAnnouncementOptionValue);
+    const deleteAnnouncementOptions = deleteValue<
+        AnnouncementOptions,
+        CategoryDataAnnouncementOptions
+    >(deleteAnnouncementOptionValue);
+
     // announcement sets
     const { data: dataAnnouncementSets } = loadData<CategoryDataAnnouncementSet>();
     const announcementSets = computed(() =>
@@ -228,6 +255,11 @@ export default function useCategory(category: Category) {
         createAnnouncementCustom,
         updateAnnouncementCustom,
         deleteAnnouncementCustom,
+        announcementOptions,
+        announcementOptionsLoaded,
+        createAnnouncementOptions,
+        updateAnnouncementOptions,
+        deleteAnnouncementOptions,
         announcementSets,
         announcementSetsLoaded,
         createAnnouncementSet,

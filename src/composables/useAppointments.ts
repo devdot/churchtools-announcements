@@ -1,16 +1,18 @@
 import { churchtoolsClient } from '@churchtools/churchtools-client';
 import { useQuery } from '@tanstack/vue-query';
 import { addDays, format } from 'date-and-time';
-import { computed, type ComputedRef, type Ref } from 'vue';
+import { computed, toRaw, type ComputedRef, type Ref } from 'vue';
 import type { AnnouncementAppointment, AnnouncementSet } from '../types/Announcement';
 import type { Category } from '../types/Category';
 import type { AppointmentCalculatedWithIncludes } from '../utils/ct-types';
+import { useAnnouncements } from './useAnnouncements';
 import useCalendars from './useCalendars';
 import useCategory from './useCategory';
 
 export default function useAppointments(category: Category, announcementSet: Ref<AnnouncementSet>) {
     const { settings, settingsLoaded } = useCategory(category);
     const { calendars, calendarIds, isLoading: isLoadingCalendars } = useCalendars();
+    const { findOptions, generateOptions } = useAnnouncements(category);
 
     const { data, isLoading } = useQuery<AppointmentCalculatedWithIncludes[]>({
         queryKey: ['appointments', calendarIds, settings, announcementSet],
@@ -38,6 +40,7 @@ export default function useAppointments(category: Category, announcementSet: Ref
         (data.value ?? []).map(appointment =>
             Object.assign(appointment.appointment.base, appointment.appointment.calculated, {
                 type: 'appointment', // note: for some reason TS recognizes this as generic string and therefore fails to match types for the entire array
+                options: toRaw(findOptions(appointment.appointment.base)) ?? generateOptions(),
             }),
         ),
     );

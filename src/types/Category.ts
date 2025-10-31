@@ -1,4 +1,5 @@
-import type { AnnouncementCustom, AnnouncementSet } from './Announcement';
+import type { AppointmentBase } from '../utils/ct-types';
+import type { AnnouncementCustom, AnnouncementOptions, AnnouncementSet } from './Announcement';
 import type { Rule } from './Rule';
 
 export interface Category {
@@ -38,6 +39,12 @@ export interface CategoryDataAnnouncementCustom
     extends CategoryData,
         Omit<AnnouncementCustom, 'type'> {
     type: 'custom';
+}
+
+export interface CategoryDataAnnouncementOptions extends CategoryData, AnnouncementOptions {
+    type: 'a_options';
+    a_id: number; // appointment-id
+    a_date: AppointmentBase['startDate'];
 }
 
 export interface CategoryDataAnnouncementSet extends CategoryData, AnnouncementSet {

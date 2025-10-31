@@ -17,6 +17,8 @@ const menu = ref([
     { route: 'category.rules', label: 'Kalender-Filter', icon: 'fa-solid fa-filter' },
     { route: 'category.settings', label: 'Einstellungen', icon: 'fa-solid fa-gear' },
 ]);
+
+const VERSION = __APP_VERSION__;
 </script>
 <template>
     <Loading v-if="isLoading" />
@@ -34,6 +36,14 @@ const menu = ref([
                     </router-link>
                 </template>
             </Menu>
+            <div class="grow"></div>
+            <a
+                class="mt-4 px-3 text-center text-sm text-gray-500 hover:underline"
+                href="https://github.com/devdot/churchtools-announcements"
+                target="_blank"
+            >
+                announcements v{{ VERSION }}
+            </a>
         </template>
         <template #main>
             <RouterView :key="category.id" :category="category" />

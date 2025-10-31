@@ -20,5 +20,8 @@ export default ({ mode }) => {
             dedupe: ['vue'],
             alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
         },
+        define: {
+            '__APP_VERSION__': JSON.stringify(process.env.npm_package_version),
+        },
     });
 };

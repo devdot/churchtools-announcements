@@ -19,7 +19,7 @@
         <div class="flex grow">
             <div
                 v-if="$slots.sidebar"
-                class="border-basic-divider bg-foreground-primary relative w-64 flex-none overflow-y-auto border-0 border-r border-solid py-6"
+                class="border-basic-divider bg-foreground-primary relative flex w-64 flex-none flex-col overflow-y-auto border-0 border-r border-solid py-6"
             >
                 <slot name="sidebar" />
             </div>

@@ -11,8 +11,8 @@ import { router } from './router';
 import type { Person } from './utils/ct-types';
 
 // only import reset.css in development mode to keep the production bundle small and to simulate CT environment
+import('./utils/tailwind.css');
 if (import.meta.env.MODE === 'development') {
-    import('./utils/tailwind.css');
     import('./utils/reset.css');
     document.body.innerHTML +=
         '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />';

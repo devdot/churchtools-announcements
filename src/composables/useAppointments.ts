@@ -40,6 +40,7 @@ export default function useAppointments(category: Category, announcementSet: Ref
 
     const appointments: ComputedRef<AnnouncementAppointment[]> = computed(() =>
         (data.value ?? []).map(function (appointment) {
+            // @ts-expect-error TS fails to recognize ZuluDate strings correctly
             const a: AnnouncementAppointment = Object.assign(
                 appointment.appointment.base,
                 appointment.appointment.calculated,

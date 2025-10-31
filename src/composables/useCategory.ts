@@ -4,17 +4,8 @@ import {
     type ApiError,
     type CustomModuleDataValue,
 } from '@churchtools/utils';
-import type {
-    CreateDataValue,
-    UpdateDataValue,
-} from '@churchtools/utils/types/custommodule/useCustomModuleDataValuesMutations';
 import type { MutateFunction } from '@tanstack/vue-query';
 import { computed, type ComputedRef, type Ref } from 'vue';
-import type {
-    AnnouncementCustom,
-    AnnouncementOptions,
-    AnnouncementSet,
-} from '../types/Announcement';
 import {
     type Category,
     type CategoryData,
@@ -25,6 +16,7 @@ import {
     type CategoryDataSettings,
 } from '../types/Category';
 import { addRule, ruleFactory, type Rule } from '../types/Rule';
+import type { CustomModuleDataValueCreate } from '../utils/ct-types';
 import useModule from './useModule';
 import { usePermissions } from './usePermissions';
 
@@ -43,40 +35,46 @@ export default function useCategory(category: Category) {
         computed(() => typeof data.value !== 'undefined');
 
     // templates for mutating data
-    const createValue = <Type extends object, DataType extends CategoryData>(
+    const createValue = <DataType extends CategoryData>(
         type: DataType['type'],
-        create: MutateFunction<CustomModuleDataValue, ApiError, CreateDataValue<DataType>>,
+        create: MutateFunction<
+            CustomModuleDataValue,
+            ApiError,
+            Omit<CustomModuleDataValueCreate, 'value'> & DataType
+        >,
     ) => {
-        return (data: Omit<Type, 'id'>) =>
+        return (data: Omit<DataType, 'id' | 'dataCategoryId' | 'type'>) =>
+            // @ts-expect-error todo: annoying subtype error
             create({
                 ...data,
                 dataCategoryId: category.id,
-                id: 0,
                 type: type,
             });
     };
-    const updateValue = <Type extends object, DataType extends CategoryData>(
+    const updateValue = <DataType extends CategoryData>(
         type: DataType['type'],
-        update: MutateFunction<CustomModuleDataValue, ApiError, UpdateDataValue<DataType>>,
+        update: MutateFunction<
+            CustomModuleDataValue,
+            ApiError,
+            Omit<CustomModuleDataValue, 'value'> & DataType
+        >,
     ) => {
-        return (data: Type) =>
+        return (data: Omit<DataType, 'dataCategoryId' | 'type'>) =>
+            // @ts-expect-error todo: annoying subtype error
             update({
                 ...data,
                 dataCategoryId: category.id,
                 type: type,
             });
     };
-    const deleteValue = <
-        Type extends Pick<CustomModuleDataValue, 'id'>,
-        DataType extends CategoryData,
-    >(
+    const deleteValue = <DataType extends CategoryData>(
         del: MutateFunction<
             unknown,
             ApiError,
             Pick<DataType, 'id'> & Pick<CustomModuleDataValue, 'dataCategoryId'>
         >,
     ) => {
-        return (data: Type) =>
+        return (data: Pick<DataType, 'id'>) =>
             del({
                 ...data,
                 dataCategoryId: category.id,
@@ -177,18 +175,17 @@ export default function useCategory(category: Category) {
         updateCustomDataValue: updateAnnouncementCustomValue,
         deleteCustomDataValue: deleteAnnouncementCustomValue,
     } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementCustom>(moduleId, categoryId);
-    const createAnnouncementCustom = createValue<
-        AnnouncementCustom,
-        CategoryDataAnnouncementCustom
-    >('custom', createAnnouncementCustomValue);
-    const updateAnnouncementCustom = updateValue<
-        AnnouncementCustom,
-        CategoryDataAnnouncementCustom
-    >('custom', updateAnnouncementCustomValue);
-    const deleteAnnouncementCustom = deleteValue<
-        AnnouncementCustom,
-        CategoryDataAnnouncementCustom
-    >(deleteAnnouncementCustomValue);
+    const createAnnouncementCustom = createValue<CategoryDataAnnouncementCustom>(
+        'custom',
+        createAnnouncementCustomValue,
+    );
+    const updateAnnouncementCustom = updateValue<CategoryDataAnnouncementCustom>(
+        'custom',
+        updateAnnouncementCustomValue,
+    );
+    const deleteAnnouncementCustom = deleteValue<CategoryDataAnnouncementCustom>(
+        deleteAnnouncementCustomValue,
+    );
 
     // announcement options (for appointments)
     const { data: dataAnnouncementOptions } = loadData<CategoryDataAnnouncementOptions>();
@@ -199,18 +196,17 @@ export default function useCategory(category: Category) {
         updateCustomDataValue: updateAnnouncementOptionValue,
         deleteCustomDataValue: deleteAnnouncementOptionValue,
     } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementOptions>(moduleId, categoryId);
-    const createAnnouncementOptions = createValue<
-        Omit<CategoryDataAnnouncementOptions, 'type'>,
-        CategoryDataAnnouncementOptions
-    >('a_options', createAnnouncementOptionValue);
-    const updateAnnouncementOptions = updateValue<
-        Omit<CategoryDataAnnouncementOptions, 'type'>,
-        CategoryDataAnnouncementOptions
-    >('a_options', updateAnnouncementOptionValue);
-    const deleteAnnouncementOptions = deleteValue<
-        AnnouncementOptions,
-        CategoryDataAnnouncementOptions
-    >(deleteAnnouncementOptionValue);
+    const createAnnouncementOptions = createValue<CategoryDataAnnouncementOptions>(
+        'a_options',
+        createAnnouncementOptionValue,
+    );
+    const updateAnnouncementOptions = updateValue<CategoryDataAnnouncementOptions>(
+        'a_options',
+        updateAnnouncementOptionValue,
+    );
+    const deleteAnnouncementOptions = deleteValue<CategoryDataAnnouncementOptions>(
+        deleteAnnouncementOptionValue,
+    );
 
     // announcement sets
     const { data: dataAnnouncementSets } = loadData<CategoryDataAnnouncementSet>();
@@ -229,15 +225,15 @@ export default function useCategory(category: Category) {
         deleteCustomDataValue: deleteAnnouncementSetValue,
     } = useCustomModuleDataValuesMutations<CategoryDataAnnouncementSet>(moduleId, categoryId);
 
-    const createAnnouncementSet = createValue<AnnouncementSet, CategoryDataAnnouncementSet>(
+    const createAnnouncementSet = createValue<CategoryDataAnnouncementSet>(
         'set',
         createAnnouncementSetValue,
     );
-    const updateAnnouncementSet = updateValue<AnnouncementSet, CategoryDataAnnouncementSet>(
+    const updateAnnouncementSet = updateValue<CategoryDataAnnouncementSet>(
         'set',
         updateAnnouncementSetValue,
     );
-    const deleteAnnouncementSet = deleteValue<AnnouncementSet, CategoryDataAnnouncementSet>(
+    const deleteAnnouncementSet = deleteValue<CategoryDataAnnouncementSet>(
         deleteAnnouncementSetValue,
     );
 

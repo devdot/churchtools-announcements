@@ -25,7 +25,6 @@ const findClosestSet = () => {
 watch(sets, () => {
     if (selectedSet.value === null) {
         selectedSet.value = findClosestSet();
-        console.log('searched for nearest', selectedSet.value?.id ?? null);
     }
 });
 const selectedSet: Ref<AnnouncementSetType | null> = ref(findClosestSet());
@@ -50,7 +49,7 @@ const makeName = (set: AnnouncementSetType | null) =>
                     <Button icon="fa-solid fa-chevron-left" severity="info" @click="select(-1)" />
                     <Select v-model="selectedSet" :loading="!setsLoaded" :options="sets">
                         <template #value="prop">
-                            {{ makeName(prop.value) }}
+                            {{ makeName(prop.value ?? null) }}
                         </template>
                         <template #option="prop">
                             {{ makeName(prop.option) }}
@@ -77,17 +76,17 @@ const makeName = (set: AnnouncementSetType | null) =>
         >
             <AnnouncementSetsAdmin :category="props.category" />
         </Dialog>
-        <Card>
+        <Card v-if="selectedSet !== null" :key="selectedSet.id">
             <template #content>
                 <h1 class="text-display-m">Ankündigungen: {{ makeName(selectedSet) }}</h1>
                 <AnnouncementSet
-                    v-if="selectedSet !== null"
                     :key="selectedSet.id"
                     :category="props.category"
                     :set="selectedSet"
                 />
             </template>
         </Card>
+        <div v-else>Ankündigungs-Termin auswählen bzw. neue anlegen.</div>
     </div>
     <Loading v-else />
 </template>

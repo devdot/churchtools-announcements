@@ -10,12 +10,12 @@ const props = defineProps<{ category: Category; categoryId: string | number }>()
 const { customs, customsLoaded, createCustom } = useAnnouncements(props.category);
 </script>
 <template>
-    <div class="max-w-content mx-auto">
+    <div class="max-w-content mx-auto space-y-6">
+        <h1 class="text-display-m">Manuelle Ansagen</h1>
         <Card>
             <template #content>
                 <div v-if="customsLoaded" class="divide-y divide-gray-200">
                     <div class="flex justify-between pb-6">
-                        <h1 class="text-display-m">Manuelle Ansagen</h1>
                         <Button
                             icon="fa-solid fa-plus"
                             label="Neu"

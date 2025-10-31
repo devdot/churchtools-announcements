@@ -30,6 +30,14 @@ watch(sets, () => {
 });
 const selectedSet: Ref<AnnouncementSetType | null> = ref(findClosestSet());
 
+const select = function (int: -1 | 1) {
+    const index = sets.value.findIndex(s => s.id === (selectedSet.value?.id ?? 0));
+    const sel = sets.value[index + int] ?? null;
+    if (sel) {
+        selectedSet.value = sel;
+    }
+};
+
 const makeName = (set: AnnouncementSetType | null) =>
     set !== null ? set.title + ' ' + format(set.date, 'DD.MM.YYYY') : '- keins -';
 </script>
@@ -39,6 +47,7 @@ const makeName = (set: AnnouncementSetType | null) =>
         <Card>
             <template #content>
                 <InputGroup>
+                    <Button icon="fa-solid fa-chevron-left" severity="info" @click="select(-1)" />
                     <Select v-model="selectedSet" :loading="!setsLoaded" :options="sets">
                         <template #value="prop">
                             {{ makeName(prop.value) }}
@@ -51,9 +60,11 @@ const makeName = (set: AnnouncementSetType | null) =>
                         v-if="can.upsertData"
                         icon="fa-solid fa-gear"
                         label="Administrieren"
+                        outlined
                         severity="info"
                         @click="showAdmin = true"
                     />
+                    <Button icon="fa-solid fa-chevron-right" severity="info" @click="select(1)" />
                 </InputGroup>
             </template>
         </Card>

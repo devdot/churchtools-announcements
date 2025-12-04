@@ -3,6 +3,7 @@ import { dateToZulu } from '@churchtools/utils';
 import { Checkbox } from 'primevue';
 import { computed, ref, toRaw } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
+import useCategory from '../../composables/useCategory';
 import type { Announcement, AnnouncementOptions, AnnouncementSet } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
 
@@ -11,6 +12,8 @@ const props = defineProps<{
     sets: AnnouncementSet[];
     announcement: Announcement;
 }>();
+
+const { settings } = useCategory(props.category);
 
 const { filterOptions, updateCustom, generateOptions, storeOptions, setsDateMax } =
     useAnnouncements(props.category);
@@ -25,10 +28,17 @@ const toZuluMidnight = function (date: Date) {
     return dateToZulu(ret);
 };
 
-const filterSet = function (set: AnnouncementSet) {
+const filterSetTime = function (set: AnnouncementSet) {
+    const time = set.date.getTime();
     return (
-        set.date.getTime() <= announcementTimestamp.value && filterOptions(props.announcement, set)
+        props.announcement.type === 'custom' ||
+        (time <= announcementTimestamp.value &&
+            time + settings.value.cutoffDays * 3600 * 24 * 1000 >= announcementTimestamp.value)
     );
+};
+
+const filterSet = function (set: AnnouncementSet) {
+    return filterSetTime(set) && filterOptions(props.announcement, set);
 };
 
 const filteredSets = computed(() => props.sets.filter(filterSet));
@@ -133,7 +143,7 @@ const changed = function (checked: boolean, set: AnnouncementSet) {
         <div v-for="set in sets" :key="set.id" class="w-10 p-2 odd:bg-gray-300/50">
             <Checkbox
                 binary
-                :disabled="isSaving || set.date.getTime() > announcementTimestamp"
+                :disabled="isSaving || !filterSetTime(set)"
                 :model-value="filterSet(set)"
                 @change="event => changed(event.target?.checked ?? false, set)"
             />

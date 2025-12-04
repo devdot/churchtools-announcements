@@ -9,13 +9,17 @@ import { useAnnouncements } from './useAnnouncements';
 import useCalendars from './useCalendars';
 import useCategory from './useCategory';
 
-export default function useAppointments(category: Category, announcementSet: Ref<AnnouncementSet>) {
+export default function useAppointments(
+    category: Category,
+    announcementSet: Ref<AnnouncementSet>,
+    announcementSetUntil: Ref<AnnouncementSet> | null = null,
+) {
     const { settings, settingsLoaded } = useCategory(category);
     const { calendars, calendarIds, isLoading: isLoadingCalendars } = useCalendars();
     const { findOptions, generateOptions, optionsLoaded } = useAnnouncements(category);
 
     const { data, isLoading } = useQuery<AppointmentCalculatedWithIncludes[]>({
-        queryKey: ['appointments', calendarIds, settings, announcementSet],
+        queryKey: ['appointments', calendarIds, settings, announcementSet, announcementSetUntil],
         queryFn: () => {
             // fill calendar ids if all (-1) are selected
             const calIds =
@@ -26,7 +30,10 @@ export default function useAppointments(category: Category, announcementSet: Ref
             return churchtoolsClient.get('/calendars/appointments', {
                 from: format(announcementSet.value.date, 'YYYY-MM-DD'),
                 to: format(
-                    addDays(announcementSet.value.date, settings.value.cutoffDays),
+                    addDays(
+                        announcementSetUntil?.value.date ?? announcementSet.value.date,
+                        settings.value.cutoffDays,
+                    ),
                     'YYYY-MM-DD',
                 ),
                 calendar_ids: calIds,

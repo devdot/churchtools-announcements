@@ -7,6 +7,7 @@ import type { Category } from '../../types/Category';
 import AnnouncementOptionsDates from './AnnouncementOptionsDates.vue';
 
 const props = defineProps<{ category: Category; announcement: Announcement }>();
+const announcement = ref(props.announcement);
 
 const popover = ref();
 const togglePopover = event => popover.value.toggle(event);
@@ -14,13 +15,11 @@ const togglePopover = event => popover.value.toggle(event);
 <template>
     <div class="flex h-10 gap-1 p-1 odd:bg-white">
         <span class="w-32 shrink-0 leading-8">{{
-            typeof props.announcement.startDate === 'string'
-                ? formatDate(new Date(props.announcement.startDate), true)
+            typeof announcement.startDate === 'string'
+                ? formatDate(new Date(announcement.startDate), true)
                 : ''
         }}</span>
-        <span class="grow" :title="props.announcement.title ?? ''">{{
-            props.announcement.title ?? ''
-        }}</span>
+        <span class="grow" :title="announcement.title ?? ''">{{ announcement.title ?? '' }}</span>
         <Button
             icon="fa-solid fa-calendar-days"
             outlined
@@ -29,10 +28,7 @@ const togglePopover = event => popover.value.toggle(event);
             @click="togglePopover"
         />
         <Popover ref="popover" class="min-w-96">
-            <AnnouncementOptionsDates
-                :announcement="props.announcement"
-                :category="props.category"
-            />
+            <AnnouncementOptionsDates :announcement="announcement" :category="props.category" />
         </Popover>
     </div>
 </template>

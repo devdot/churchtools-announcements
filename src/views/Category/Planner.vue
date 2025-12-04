@@ -17,13 +17,13 @@ const props = defineProps<{ category: Category; categoryId: string | number }>()
 const { rules, rulesLoaded } = useCategory(props.category);
 const { customs, customsLoaded, sets, setsLoaded } = useAnnouncements(props.category);
 
-// todo: make this selected set dynamic
-const selectedSet: ComputedRef<AnnouncementSet> = computed(() => sets.value[0]);
+const setFirst: ComputedRef<AnnouncementSet> = computed(() => sets.value[0]);
+const setLast: ComputedRef<AnnouncementSet> = computed(() => sets.value[sets.value.length - 1]);
 
 const { appointments: appointmentsRaw, isLoading: isLoadingAppointments } = useAppointments(
     props.category,
-    selectedSet,
-    // todo: let me fetch appointments until a later (custom) date
+    setFirst,
+    setLast,
 );
 
 const filterAnnouncements = ref(true);

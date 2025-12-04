@@ -73,7 +73,12 @@ const maxDate = computed(() =>
 );
 </script>
 <template>
-    <div class="space-y-2">
+    <div
+        v-tooltip.top="
+            'Mit diesen Einstellungen lässt sich festlegen, zu welchen Ankündigungs-Terminen diese Ansage angezeigt bzw. angesagt werden soll.'
+        "
+        class="space-y-2"
+    >
         <SelectButton
             v-model="options.announce.type"
             fluid

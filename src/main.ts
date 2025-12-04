@@ -4,6 +4,7 @@ import { ctUtils } from '@churchtools/utils';
 import Lara from '@primeuix/themes/lara';
 import { VueQueryPlugin } from '@tanstack/vue-query';
 import { createPinia } from 'pinia';
+import { Tooltip } from 'primevue';
 import PrimeVue from 'primevue/config';
 import { createApp } from 'vue';
 import App from './App.vue';
@@ -49,6 +50,8 @@ app.use(PrimeVue, {
         },
     },
 });
+
+app.directive('tooltip', Tooltip);
 
 const username = import.meta.env.VITE_USERNAME;
 const password = import.meta.env.VITE_PASSWORD;

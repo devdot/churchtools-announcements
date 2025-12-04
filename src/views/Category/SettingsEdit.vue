@@ -100,6 +100,9 @@ const del = function () {
                         <InputText
                             id="shorty"
                             v-model="category.shorty"
+                            v-tooltip.top="
+                                'Der Shorty kann nur von Administratoren in der Erweiterungs-Übersicht geändert werden!'
+                            "
                             :disabled="true"
                             fluid
                             size="small"
@@ -152,6 +155,9 @@ const del = function () {
                         <InputNumber
                             id="cutoffDays"
                             v-model="settings.cutoffDays"
+                            v-tooltip.top="
+                                'Die maximale Vorausschau gibt an, wie weit im voraus Termine, Ansagen und Ankündigungs-Termine generiert bzw. angezeigt werden.'
+                            "
                             :disabled="!can.upsertData"
                             fluid
                             :max="720"
@@ -167,6 +173,9 @@ const del = function () {
                         <InputNumber
                             id="pruneDays"
                             v-model="settings.pruneDays"
+                            v-tooltip.top="
+                                'Das maximale Alter gibt an, bis alte Ankündigungs-Termine oder Ansage-Informationen automatisch löschbar sind.'
+                            "
                             :disabled="!can.upsertData"
                             fluid
                             :max="365"
@@ -183,6 +192,9 @@ const del = function () {
                         <Select
                             id="eventCalendarId"
                             v-model="settings.eventCalendarId"
+                            v-tooltip.top="
+                                'Ankündigungs-Termine können automatisch aus den Events in diesem Kalender generiert werden.'
+                            "
                             :disabled="!can.upsertData"
                             fluid
                             :loading="calendarsLoading"
@@ -193,12 +205,15 @@ const del = function () {
                             showClear
                             @update:model-value="dirtyMain = true"
                         />
-                        <label for="eventCalendarId">Ankündigungs-Sets aus Event-Kalender</label>
+                        <label for="eventCalendarId">Ankündigungs-Termine aus Event-Kalender</label>
                     </FloatLabel>
                     <FloatLabel variant="on">
                         <Select
                             id="interval.type"
                             v-model="settings.interval.type"
+                            v-tooltip.top="
+                                'Ankündigungs-Termine können nach einem Intervalmuster generiert werden.'
+                            "
                             :disabled="!can.upsertData"
                             fluid
                             option-label="name"
@@ -207,7 +222,7 @@ const del = function () {
                             placeholder="Nie"
                             @update:model-value="dirtyMain = true"
                         />
-                        <label for="interval.type">Ankündigungs-Sets nach Interval</label>
+                        <label for="interval.type">Ankündigungs-Termine nach Interval</label>
                     </FloatLabel>
                     <FloatLabel v-if="settings.interval.type !== 'never'" variant="on">
                         <InputNumber

@@ -47,7 +47,7 @@ const appointments = computed(() =>
                             <div class="border-b border-gray-400">
                                 <div class="h-24 p-1">
                                     <div class="flex items-center gap-4">
-                                        <label>"Nie"-Ankündigungen anzeigen</label>
+                                        <label>"Nie"-Ansagen anzeigen</label>
                                         <ToggleSwitch v-model="showHidden" />
                                     </div>
                                 </div>

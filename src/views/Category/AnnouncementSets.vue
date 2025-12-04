@@ -86,7 +86,7 @@ const makeName = (set: AnnouncementSetType | null) =>
                 />
             </template>
         </Card>
-        <div v-else>Ankündigungs-Termin auswählen bzw. neue anlegen.</div>
+        <div v-else>Bitte Ankündigungs-Termin auswählen bzw. neue anlegen.</div>
     </div>
     <Loading v-else />
 </template>

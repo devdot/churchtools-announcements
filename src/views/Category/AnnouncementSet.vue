@@ -46,7 +46,10 @@ const can = canFn(props.category);
                 {{ category.description }}
             </div>
             <div>
-                <ToggleSwitch v-model="disableOptionsFilter" title="versteckte anzeigen" />
+                <ToggleSwitch
+                    v-model="disableOptionsFilter"
+                    v-tooltip.top="'Versteckte Ansagen anzeigen'"
+                />
             </div>
         </div>
         <Announcement

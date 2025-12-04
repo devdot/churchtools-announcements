@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
-import CategoryAnnouncementCustoms from './views/Category/AnnouncementCustoms.vue';
+import CategoryAnnouncements from './views/Category/Announcements.vue';
 import CategoryAnnouncementSets from './views/Category/AnnouncementSets.vue';
 import Category from './views/Category/Category.vue';
 import CategoryPlanner from './views/Category/Planner.vue';
@@ -28,9 +28,9 @@ const routes: RouteRecordRaw[] = [
                 props: true,
             },
             {
-                path: 'customs',
-                name: 'category.customs',
-                component: CategoryAnnouncementCustoms,
+                path: 'announcements',
+                name: 'category.announcements',
+                component: CategoryAnnouncements,
                 props: true,
             },
             {

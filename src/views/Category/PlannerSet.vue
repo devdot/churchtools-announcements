@@ -37,7 +37,7 @@ const sum = computed(
         <div class="h-6 text-center" :title="formatDate(set.date)">
             {{ format(set.date, 'DD.MM.') }}
         </div>
-        <div class="h-6 border-b p-1 text-center font-bold">
+        <div class="h-6 p-1 text-center font-bold">
             {{ sum }}
         </div>
     </div>

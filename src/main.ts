@@ -1,4 +1,4 @@
-import { churchtoolsClient } from '@churchtools/churchtools-client';
+import { activateLogging, churchtoolsClient } from '@churchtools/churchtools-client';
 // import { ctStyleguide } from '@churchtools/styleguide';
 import { ctUtils } from '@churchtools/utils';
 import Lara from '@primeuix/themes/lara';
@@ -56,6 +56,8 @@ app.directive('tooltip', Tooltip);
 const username = import.meta.env.VITE_USERNAME;
 const password = import.meta.env.VITE_PASSWORD;
 if (import.meta.env.MODE === 'development' && username && password) {
+    activateLogging();
+
     const login = () =>
         churchtoolsClient.post('/login', {
             username,

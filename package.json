@@ -11,7 +11,7 @@
         "deploy": "npm run build && node scripts/package.js"
     },
     "devDependencies": {
-        "@churchtools/churchtools-client": "^1.4.0",
+        "@churchtools/churchtools-client": "=1.4.0",
         "@churchtools/colors": "^0.1.1",
         "@churchtools/utils": "^0.9.1",
         "@tailwindcss/vite": "^4.1.14",
@@ -33,7 +33,7 @@
         "vue-tsc": "^3.1.1"
     },
     "dependencies": {
-        "@primeuix/themes": "^1.2.5",
+        "@primeuix/themes": "^2.0.2",
         "date-and-time": "^4.1.0",
         "pinia": "^3.0.3",
         "primevue": "^4.4.1",

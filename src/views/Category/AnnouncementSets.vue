@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { format } from 'date-and-time';
-import { Button, Card, Dialog, InputGroup, Select } from 'primevue';
+import { Button, Card, InputGroup, Select } from 'primevue';
 import { ref, watch, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import { usePermissions } from '../../composables/usePermissions';
@@ -8,11 +8,8 @@ import type { AnnouncementSet as AnnouncementSetType } from '../../types/Announc
 import type { Category } from '../../types/Category';
 import Loading from '../Utils/Loading.vue';
 import AnnouncementSet from './AnnouncementSet.vue';
-import AnnouncementSetsAdmin from './AnnouncementSetsAdmin.vue';
 
 const props = defineProps<{ category: Category; categoryId: string | number }>();
-
-const showAdmin = ref(false);
 
 const { sets, setsLoaded } = useAnnouncements(props.category);
 const { can: canFn } = usePermissions();
@@ -58,24 +55,15 @@ const makeName = (set: AnnouncementSetType | null) =>
                     <Button
                         v-if="can.upsertData"
                         icon="fa-solid fa-gear"
-                        label="Administrieren"
+                        label=""
                         outlined
                         severity="info"
-                        @click="showAdmin = true"
+                        @click="$router.push({ name: 'category.sets' })"
                     />
                     <Button icon="fa-solid fa-chevron-right" severity="info" @click="select(1)" />
                 </InputGroup>
             </template>
         </Card>
-        <Dialog
-            v-if="can.upsertData"
-            v-model:visible="showAdmin"
-            class="w-1/2"
-            header="Ankündigungen Administrieren"
-            modal
-        >
-            <AnnouncementSetsAdmin :category="props.category" />
-        </Dialog>
         <Card v-if="selectedSet !== null" :key="selectedSet.id">
             <template #content>
                 <h1 class="text-display-m">Ankündigungen: {{ makeName(selectedSet) }}</h1>

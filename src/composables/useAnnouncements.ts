@@ -1,4 +1,5 @@
 import { addDays, format, isSameDay } from 'date-and-time';
+// @ts-expect-error this import is correct according to docs
 import de from 'date-and-time/locales/de';
 import { computed, unref, type ComputedRef, type MaybeRef } from 'vue';
 import type {

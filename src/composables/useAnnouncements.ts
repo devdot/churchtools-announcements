@@ -1,4 +1,5 @@
 import { addDays, format, isSameDay } from 'date-and-time';
+import de from 'date-and-time/locales/de';
 import { computed, unref, type ComputedRef, type MaybeRef } from 'vue';
 import type {
     Announcement,
@@ -133,6 +134,16 @@ export const useAnnouncements = function (category: Category) {
         return dates;
     });
 
+    const getFormattedDateString = function (appointment: AnnouncementAppointment): string {
+        if (appointment.allDay) {
+            const start = format(new Date(appointment.startDate), 'DD. MMMM', { locale: de });
+            const end = format(new Date(appointment.endDate), 'DD. MMMM', { locale: de });
+            return start === end ? start : start + ' - ' + end;
+        } else {
+            return format(new Date(appointment.startDate), 'DD. MMMM HH:mm', { locale: de });
+        }
+    };
+
     return {
         filterOptions,
         customs,
@@ -159,5 +170,6 @@ export const useAnnouncements = function (category: Category) {
         setsDateMin,
         setsDateMax,
         setsDatesDisabled,
+        getFormattedDateString,
     };
 };

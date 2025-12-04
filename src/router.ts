@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import CategoryAnnouncementCustoms from './views/Category/AnnouncementCustoms.vue';
 import CategoryAnnouncementSets from './views/Category/AnnouncementSets.vue';
 import Category from './views/Category/Category.vue';
+import CategoryPlanner from './views/Category/Planner.vue';
 import CategoryRules from './views/Category/Rules.vue';
 import CategorySettings from './views/Category/Settings.vue';
 import NotFound from './views/NotFound.vue';
@@ -30,6 +31,12 @@ const routes: RouteRecordRaw[] = [
                 path: 'customs',
                 name: 'category.customs',
                 component: CategoryAnnouncementCustoms,
+                props: true,
+            },
+            {
+                path: 'planner',
+                name: 'category.planner',
+                component: CategoryPlanner,
                 props: true,
             },
             {

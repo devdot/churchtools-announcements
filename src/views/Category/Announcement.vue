@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { format } from 'date-and-time';
-import de from 'date-and-time/locales/de';
 import { Button, ButtonGroup, InputText, Popover, Textarea } from 'primevue';
 import { computed, ref, toRaw, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
-import type { Announcement, AnnouncementAppointment } from '../../types/Announcement';
+import type { Announcement } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
 import AnnouncementOptionsDates from './AnnouncementOptionsDates.vue';
 
@@ -13,24 +11,16 @@ const announcement = ref(structuredClone(toRaw(props.announcement)));
 const type: Ref<Announcement['type']> = computed(() => props.announcement.type);
 const isEditing = ref(false);
 
-const { updateCustom, deleteCustom } = useAnnouncements(props.category);
-
-const getDateString = function (appointment: AnnouncementAppointment): string {
-    if (appointment.allDay) {
-        const start = format(new Date(appointment.startDate), 'DD. MMMM', { locale: de });
-        const end = format(new Date(appointment.endDate), 'DD. MMMM', { locale: de });
-        return start === end ? start : start + ' - ' + end;
-    } else {
-        return format(new Date(appointment.startDate), 'DD. MMMM HH:mm', { locale: de });
-    }
-};
+const { updateCustom, deleteCustom, getFormattedDateString } = useAnnouncements(props.category);
 
 const popover = ref();
 const togglePopover = event => popover.value.toggle(event);
 </script>
 <template>
     <div>
-        <div v-if="type === 'appointment'" class="font-bold">{{ getDateString(announcement) }}</div>
+        <div v-if="type === 'appointment'" class="font-bold">
+            {{ getFormattedDateString(announcement) }}
+        </div>
         <div class="flex items-center justify-between leading-4">
             <div v-if="!isEditing" class="text-lg">
                 <span>{{ announcement.title }}</span>

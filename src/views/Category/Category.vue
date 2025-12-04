@@ -14,6 +14,7 @@ const category = findCategory(props.categoryId);
 const menu = ref([
     { route: 'category', label: 'Ankündigungen', icon: 'fa-solid fa-scroll' },
     { route: 'category.customs', label: 'Ansagen', icon: 'fa-solid fa-bullhorn' },
+    { route: 'category.planner', label: 'Planer', icon: 'fa-solid fa-calendar-days' },
     { route: 'category.rules', label: 'Kalender-Filter', icon: 'fa-solid fa-filter' },
     { route: 'category.settings', label: 'Einstellungen', icon: 'fa-solid fa-gear' },
 ]);

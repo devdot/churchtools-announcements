@@ -6,6 +6,8 @@ import type { Announcement } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
 import Persons from '../Components/Persons.vue';
 import PersonsSelect from '../Components/PersonsSelect.vue';
+import Tags from '../Components/Tags.vue';
+import TagsEdit from '../Components/TagsEdit.vue';
 import AnnouncementOptionsDates from './AnnouncementOptionsDates.vue';
 
 const props = defineProps<{ category: Category; announcement: Announcement; canEdit: boolean }>();
@@ -111,6 +113,10 @@ const save = function () {
                     <span>Notizen: </span>
                     <span>{{ announcement.options?.notes ?? '' }} </span>
                 </div>
+                <Tags
+                    v-if="(announcement.options?.tags ?? []).length > 0"
+                    :tags="announcement.options.tags"
+                />
             </div>
             <div v-else class="space-y-2">
                 <PersonsSelect
@@ -131,6 +137,7 @@ const save = function () {
                     <Textarea id="notes" v-model="announcement.options.notes" fluid></Textarea>
                     <label for="notes">Notizen</label>
                 </FloatLabel>
+                <TagsEdit v-model="announcement.options.tags" />
             </div>
         </div>
         <Popover v-if="canEdit" ref="popover" class="min-w-96">

@@ -1,7 +1,7 @@
 {
     "name": "devdot_announcements",
     "private": true,
-    "version": "0.2",
+    "version": "0.2.1",
     "type": "module",
     "scripts": {
         "fix": "eslint --fix",
@@ -11,7 +11,7 @@
         "deploy": "npm run build && node scripts/package.js"
     },
     "devDependencies": {
-        "@churchtools/churchtools-client": "=1.4.0",
+        "@churchtools/churchtools-client": "^1.5.2",
         "@churchtools/colors": "^0.1.1",
         "@churchtools/utils": "^0.9.1",
         "@tailwindcss/vite": "^4.1.14",

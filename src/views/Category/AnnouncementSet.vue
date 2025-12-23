@@ -10,6 +10,7 @@ import type { Category } from '../../types/Category';
 import { filterRule } from '../../types/Rule';
 import Loading from '../Utils/Loading.vue';
 import Announcement from './Announcement.vue';
+import AnnouncementSetService from './AnnouncementSetService.vue';
 
 const props = defineProps<{
     category: Category;
@@ -17,7 +18,7 @@ const props = defineProps<{
 }>();
 
 const { appointments, isLoading } = useAppointments(props.category, ref(props.set));
-const { rules, rulesLoaded, announcementOptionsLoaded } = useCategory(props.category);
+const { rules, rulesLoaded, announcementOptionsLoaded, settings } = useCategory(props.category);
 const { filterOptions, customs } = useAnnouncements(props.category);
 
 const isLoaded = computed(() => !isLoading.value && rulesLoaded && announcementOptionsLoaded);
@@ -41,7 +42,8 @@ const can = canFn(props.category);
 </script>
 <template>
     <div v-if="isLoaded" class="divide-y divide-gray-200">
-        <div class="flex gap-4">
+        <AnnouncementSetService v-if="set.eventId" :set="set" :settings="settings" />
+        <div class="flex items-center gap-4 py-2">
             <div v-if="category.description !== ''" class="grow pt-2 pb-4">
                 {{ category.description }}
             </div>

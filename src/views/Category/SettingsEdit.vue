@@ -15,6 +15,7 @@ import { useRouter } from 'vue-router';
 import useCalendars from '../../composables/useCalendars';
 import useCategories from '../../composables/useCategories';
 import useCategory from '../../composables/useCategory';
+import useServices from '../../composables/useServices';
 import type { Category, CategoryDataSettings, CategorySettings } from '../../types/Category';
 
 const props = defineProps<{ category: Category; settings: CategoryDataSettings }>();
@@ -32,6 +33,8 @@ const intervalTypes: { name: string; value: CategorySettings['interval']['type']
     { name: 'Monatstag', value: 'month' },
     { name: 'Nie', value: 'never' },
 ];
+
+const { services, isLoading: servicesLoading } = useServices();
 
 const dirtyHeader = ref(false);
 const saveHeader = function () {
@@ -206,6 +209,45 @@ const del = function () {
                             @update:model-value="dirtyMain = true"
                         />
                         <label for="eventCalendarId">Ankündigungs-Termine aus Event-Kalender</label>
+                    </FloatLabel>
+                    <FloatLabel variant="on">
+                        <MultiSelect
+                            id="eventAnnounceeServiceIds"
+                            v-model="settings.eventAnnounceeServiceIds"
+                            v-tooltip.top="
+                                'Für Ankündigungen, die mit einem Event verbunden sind, können die Dienste assoziiert werden, deren eingeteilte Personen die Ankündigungen ankündigen sollen.'
+                            "
+                            :disabled="!can.upsertData"
+                            fluid
+                            :loading="servicesLoading"
+                            option-label="name"
+                            option-value="id"
+                            :options="services"
+                            placeholder="Keiner"
+                            showClear
+                            @update:model-value="dirtyMain = true"
+                        />
+                        <label for="eventAnnounceeServiceIds">Event-Dienst des Ankündigers</label>
+                    </FloatLabel>
+                    <FloatLabel variant="on">
+                        <MultiSelect
+                            id="eventShowServiceIds"
+                            v-model="settings.eventShowServiceIds"
+                            v-tooltip.top="
+                                'Für Ankündigungen, die mit einem Event verbunden sind, können eingeteilte Personen weiterer assoziierter Dienste angezeigt werden.'
+                            "
+                            :disabled="!can.upsertData"
+                            filter
+                            fluid
+                            :loading="servicesLoading"
+                            option-label="name"
+                            option-value="id"
+                            :options="services"
+                            placeholder="Keiner"
+                            showClear
+                            @update:model-value="dirtyMain = true"
+                        />
+                        <label for="eventShowServiceIds">Anzeige von Event-Diensten</label>
                     </FloatLabel>
                     <FloatLabel variant="on">
                         <Select

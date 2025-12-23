@@ -93,6 +93,8 @@ export default function useCategory(category: Category) {
             day: 0, // sunday
         },
         eventCalendarId: null,
+        eventAnnounceeServiceIds: [],
+        eventShowServiceIds: [],
         pruneDays: 14,
     };
     const settings = computed(() =>

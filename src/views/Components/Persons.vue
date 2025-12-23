@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { churchtoolsClient } from '@churchtools/churchtools-client';
-import type { Person } from '@churchtools/utils';
+import type { Person as PersonType } from '@churchtools/utils';
 import { useQuery } from '@tanstack/vue-query';
-import { Chip } from 'primevue';
 import { computed } from 'vue';
+import Person from './Person.vue';
 
 const props = defineProps<{
     ids: number[];
     label: string;
 }>();
 
-const { data, isLoading } = useQuery<Person[]>({
-    queryKey: ['persons', 'ids', props.ids],
-    queryFn: () => churchtoolsClient.get<Person[]>('/persons', { ids: props.ids }),
+const ids = computed(() => (props.ids.length === 0 ? [0] : props.ids));
+
+const { data, isLoading } = useQuery<PersonType[]>({
+    queryKey: ['persons', 'ids', ids],
+    queryFn: () => churchtoolsClient.get<PersonType[]>('/persons', { ids: ids.value }),
     staleTime: 1000 * 60 * 10, // 10 minutes
     initialData: [],
     initialDataUpdatedAt: 0,
@@ -22,28 +24,21 @@ const persons = computed(() =>
     isLoading.value
         ? props.ids.map(id => ({
               id: id,
-              name: '#' + id,
-              image: null,
+              title: '#' + id,
+              imageUrl: '/system/assets/img/nobody-new.jpg',
+              frontendUrl: '/?q=churchdb#PersonView/searchEntry:#' + person.id,
           }))
         : data.value.map(person => ({
-              id: person.id,
-              name: person.firstName + ' ' + person.lastName,
-              image: person.imageUrl,
+              imageUrl: '/system/assets/img/nobody-new.jpg',
+              frontendUrl: '/?q=churchdb#PersonView/searchEntry:#' + person.id,
+              ...person,
+              title: person.firstName + ' ' + person.lastName,
           })),
 );
 </script>
 <template>
     <div class="flex items-center gap-2">
         <div v-if="label != ''">{{ label }}</div>
-        <a
-            v-for="person in persons"
-            :key="person.id"
-            :href="'/?q=churchdb#PersonView/searchEntry:#' + person.id"
-        >
-            <Chip
-                :image="person.image ?? '/system/assets/img/nobody-new.jpg'"
-                :label="person.name"
-            />
-        </a>
+        <Person v-for="person in persons" :key="person.id" :person="person" />
     </div>
 </template>

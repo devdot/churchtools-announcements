@@ -24,6 +24,8 @@ export interface CategorySettings {
         day: number; // js Date.getDay, Sunday = 0
     };
     eventCalendarId: number | null;
+    eventAnnounceeServiceIds: number[];
+    eventShowServiceIds: number[];
     pruneDays: number; // prune data that is older than number of days
 }
 

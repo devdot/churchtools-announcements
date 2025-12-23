@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Button, ButtonGroup, InputText, Popover, Textarea } from 'primevue';
+import { Button, ButtonGroup, FloatLabel, InputText, Popover, Textarea } from 'primevue';
 import { computed, ref, toRaw, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import type { Announcement } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
+import Persons from '../Components/Persons.vue';
+import PersonsSelect from '../Components/PersonsSelect.vue';
 import AnnouncementOptionsDates from './AnnouncementOptionsDates.vue';
 
 const props = defineProps<{ category: Category; announcement: Announcement; canEdit: boolean }>();
@@ -15,6 +17,8 @@ const { updateCustom, deleteCustom, getFormattedDateString } = useAnnouncements(
 
 const popover = ref();
 const togglePopover = event => popover.value.toggle(event);
+
+const typeName = computed(() => (announcement.value.type == 'appointment' ? 'Termin' : 'Ansage'));
 </script>
 <template>
     <div>
@@ -28,8 +32,11 @@ const togglePopover = event => popover.value.toggle(event);
                     ({{ announcement.subtitle }})
                 </span>
             </div>
-            <div v-else>
-                <InputText v-model="announcement.title" fluid placeholder="Titel" />
+            <div v-else class="mb-2">
+                <FloatLabel variant="on">
+                    <InputText id="title" v-model="announcement.title" fluid placeholder="Titel" />
+                    <label for="title" v-html="'Titel von ' + typeName"></label>
+                </FloatLabel>
             </div>
             <ButtonGroup v-if="canEdit">
                 <Button
@@ -69,11 +76,39 @@ const togglePopover = event => popover.value.toggle(event);
             </ButtonGroup>
         </div>
         <div class="pl-4">
-            <div v-if="!isEditing">
-                {{ announcement.description ?? '' }}
+            <div v-if="!isEditing" class="space-y-2">
+                <Persons
+                    v-if="announcement.options.announceeIds.length > 0"
+                    :ids="announcement.options.announceeIds"
+                    label="Angekündigt von:"
+                />
+                <p v-if="announcement.description ?? '' != ''">
+                    {{ announcement.description ?? '' }}
+                </p>
+                <Persons
+                    v-if="announcement.options.contactIds.length > 0"
+                    :ids="announcement.options.contactIds"
+                    label="Ansprechpartner:"
+                />
+                <div v-if="announcement.options?.notes ?? '' != ''" class="italic">
+                    <span>Notizen: </span>
+                    <span>{{ announcement.options?.notes ?? '' }} </span>
+                </div>
             </div>
-            <div v-else>
-                <Textarea v-model="announcement.description" fluid></Textarea>
+            <div v-else class="space-y-2">
+                <PersonsSelect
+                    v-model="announcement.options.announceeIds"
+                    label="Angekündigt von"
+                />
+                <FloatLabel variant="on">
+                    <Textarea id="description" v-model="announcement.description" fluid></Textarea>
+                    <label for="description">Beschreibung</label>
+                </FloatLabel>
+                <PersonsSelect v-model="announcement.options.contactIds" label="Ansprechpartner" />
+                <FloatLabel variant="on">
+                    <Textarea id="notes" v-model="announcement.options.notes" fluid></Textarea>
+                    <label for="notes">Notizen</label>
+                </FloatLabel>
             </div>
         </div>
         <Popover v-if="canEdit" ref="popover" class="min-w-96">

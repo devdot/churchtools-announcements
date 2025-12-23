@@ -12,13 +12,24 @@ const props = defineProps<{ category: Category; announcement: Announcement; canE
 const announcement = ref(structuredClone(toRaw(props.announcement)));
 const type: Ref<Announcement['type']> = computed(() => props.announcement.type);
 const isEditing = ref(false);
+const isAppointment = computed(() => type.value == 'appointment');
 
-const { updateCustom, deleteCustom, getFormattedDateString } = useAnnouncements(props.category);
+const { updateCustom, storeOptions, deleteCustom, getFormattedDateString } = useAnnouncements(
+    props.category,
+);
 
 const popover = ref();
 const togglePopover = event => popover.value.toggle(event);
 
 const typeName = computed(() => (announcement.value.type == 'appointment' ? 'Termin' : 'Ansage'));
+
+const save = function () {
+    if (type.value === 'custom') {
+        updateCustom(announcement.value);
+    } else {
+        storeOptions(announcement.value);
+    }
+};
 </script>
 <template>
     <div>
@@ -34,13 +45,19 @@ const typeName = computed(() => (announcement.value.type == 'appointment' ? 'Ter
             </div>
             <div v-else class="mb-2">
                 <FloatLabel variant="on">
-                    <InputText id="title" v-model="announcement.title" fluid placeholder="Titel" />
+                    <InputText
+                        id="title"
+                        v-model="announcement.title"
+                        :disabled="isAppointment"
+                        fluid
+                        placeholder="Titel"
+                    />
                     <label for="title" v-html="'Titel von ' + typeName"></label>
                 </FloatLabel>
             </div>
             <ButtonGroup v-if="canEdit">
                 <Button
-                    v-if="type === 'custom' && !isEditing"
+                    v-if="!isEditing"
                     icon="fa-solid fa-pen"
                     outlined
                     severity="secondary"
@@ -48,13 +65,13 @@ const typeName = computed(() => (announcement.value.type == 'appointment' ? 'Ter
                     @click="isEditing = true"
                 />
                 <Button
-                    v-if="type === 'custom' && isEditing"
+                    v-if="isEditing"
                     icon="fa-solid fa-save"
                     outlined
                     severity="secondary"
                     size="small"
                     @click="
-                        updateCustom(announcement);
+                        save();
                         isEditing = false;
                     "
                 />
@@ -101,7 +118,12 @@ const typeName = computed(() => (announcement.value.type == 'appointment' ? 'Ter
                     label="Angekündigt von"
                 />
                 <FloatLabel variant="on">
-                    <Textarea id="description" v-model="announcement.description" fluid></Textarea>
+                    <Textarea
+                        id="description"
+                        v-model="announcement.description"
+                        :disabled="isAppointment"
+                        fluid
+                    ></Textarea>
                     <label for="description">Beschreibung</label>
                 </FloatLabel>
                 <PersonsSelect v-model="announcement.options.contactIds" label="Ansprechpartner" />

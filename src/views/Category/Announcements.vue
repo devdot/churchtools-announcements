@@ -3,8 +3,10 @@ import { Button, ButtonGroup, Card } from 'primevue';
 import { computed, ref, type ComputedRef } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import useAppointments from '../../composables/useAppointments';
+import useCategory from '../../composables/useCategory';
 import type { AnnouncementSet, Announcement as AnnouncementType } from '../../types/Announcement';
 import type { Category } from '../../types/Category';
+import { filterRule } from '../../types/Rule';
 import Loading from '../Utils/Loading.vue';
 import Announcement from './Announcement.vue';
 
@@ -19,11 +21,15 @@ const setFirst: ComputedRef<AnnouncementSet> = computed(() => sets.value[0]);
 const setLast: ComputedRef<AnnouncementSet> = computed(() => sets.value[sets.value.length - 1]);
 
 const { appointments, isLoading } = useAppointments(props.category, setFirst, setLast);
+const { rules } = useCategory(props.category);
+const filteredAppointments = computed(() =>
+    appointments.value.filter(a => filterRule(rules.value, a)),
+);
 
 const announcements: ComputedRef<AnnouncementType[]> = computed(function () {
     const arr = [];
     if (showCustoms.value) arr.push(...customs.value);
-    if (showAppointments.value) arr.push(...appointments.value);
+    if (showAppointments.value) arr.push(...filteredAppointments.value);
     return arr;
 });
 </script>

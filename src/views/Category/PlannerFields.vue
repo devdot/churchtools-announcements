@@ -11,7 +11,26 @@ const props = defineProps<{
     category: Category;
     sets: AnnouncementSet[];
     announcement: Announcement;
+    hoveredSet: number | null;
 }>();
+
+const emits = defineEmits<{
+    hover: {
+        announcement_id: number | string | null;
+        set_id: number | null;
+    };
+}>();
+const hover = function (mode: 'start' | 'stop', set_id: number | null = null) {
+    const start = mode === 'start';
+    isHovered.value = start;
+    emits('hover', {
+        announcement_id: start
+            ? props.announcement.id + (props.announcement.startDate ?? '')
+            : null,
+        set_id: start ? set_id : null,
+    });
+};
+const isHovered = ref(false);
 
 const { settings } = useCategory(props.category);
 
@@ -139,11 +158,17 @@ const changed = function (checked: boolean, set: AnnouncementSet) {
 };
 </script>
 <template>
-    <div class="flex h-10">
+    <div class="flex h-10" @mouseleave="hover('stop')">
         <div
             v-for="set in sets"
             :key="set.id"
-            class="w-10 p-2 odd:bg-gray-300/50 dark:odd:bg-gray-700/50"
+            :class="[
+                'w-10 p-2',
+                hoveredSet == set.id || isHovered
+                    ? 'planner-hovered'
+                    : 'odd:bg-gray-300/50 dark:odd:bg-gray-700/50',
+            ]"
+            @mouseenter="hover('start', set.id)"
         >
             <Checkbox
                 binary

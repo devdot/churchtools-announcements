@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Card, ToggleSwitch } from 'primevue';
-import { computed, ref, type ComputedRef } from 'vue';
+import { computed, ref, type ComputedRef, type Ref } from 'vue';
 import { useAnnouncements } from '../../composables/useAnnouncements';
 import useAppointments from '../../composables/useAppointments';
 import useCategory from '../../composables/useCategory';
@@ -34,6 +34,16 @@ const appointments = computed(() =>
             (showHidden.value || (appointment.options?.announce.type ?? '') !== 'never'),
     ),
 );
+
+const hoverAnnouncement: Ref<number | null> = ref(null);
+const hoverSet: Ref<number | null> = ref(null);
+const onHover = function (event: {
+    announcement_id: number | string | null;
+    set_id: number | null;
+}) {
+    hoverAnnouncement.value = event.announcement_id;
+    hoverSet.value = event.set_id;
+};
 </script>
 <template>
     <Loading v-if="!customsLoaded || !setsLoaded || !rulesLoaded || isLoadingAppointments" />
@@ -60,14 +70,24 @@ const appointments = computed(() =>
                                     :key="custom.id"
                                     :announcement="custom"
                                     :category="props.category"
-                                    class="flex h-10 gap-1 p-1 even:bg-gray-100 even:dark:bg-gray-800"
+                                    :class="[
+                                        'flex h-10 gap-1 p-1',
+                                        custom.id == hoverAnnouncement
+                                            ? 'planner-hovered'
+                                            : 'even:bg-gray-100 even:dark:bg-gray-800',
+                                    ]"
                                 />
                                 <PlannerAnnouncement
                                     v-for="appointment in appointments"
                                     :key="appointment.id + appointment.startDate"
                                     :announcement="appointment"
                                     :category="props.category"
-                                    class="flex h-10 gap-1 p-1 even:bg-gray-100 even:dark:bg-gray-800"
+                                    :class="[
+                                        'flex h-10 gap-1 p-1',
+                                        appointment.id + appointment.startDate == hoverAnnouncement
+                                            ? 'planner-hovered'
+                                            : 'even:bg-gray-100 even:dark:bg-gray-800',
+                                    ]"
                                 />
                             </div>
                         </div>
@@ -78,7 +98,11 @@ const appointments = computed(() =>
                                     :key="set.id"
                                     :appointments="appointments"
                                     :category="props.category"
-                                    class="odd:bg-gray-200 odd:dark:bg-gray-700"
+                                    :class="[
+                                        set.id == hoverSet
+                                            ? 'planner-hovered'
+                                            : 'odd:bg-gray-200 odd:dark:bg-gray-700',
+                                    ]"
                                     :customs="customs"
                                     :set="set"
                                 />
@@ -90,16 +114,28 @@ const appointments = computed(() =>
                                     :key="custom.id"
                                     :announcement="custom"
                                     :category="category"
-                                    class="odd:bg-white/50 dark:odd:bg-black/50"
+                                    :class="[
+                                        custom.id == hoverAnnouncement
+                                            ? 'planner-hovered'
+                                            : 'odd:bg-white/50 dark:odd:bg-black/50',
+                                    ]"
+                                    :hovered-set="hoverSet"
                                     :sets="sets"
+                                    @hover="onHover"
                                 />
                                 <PlannerFields
                                     v-for="appointment in appointments"
                                     :key="appointment.id + appointment.startDate"
                                     :announcement="appointment"
                                     :category="category"
-                                    class="odd:bg-white/50 dark:odd:bg-black/50"
+                                    :class="[
+                                        appointment.id + appointment.startDate == hoverAnnouncement
+                                            ? 'planner-hovered'
+                                            : 'odd:bg-white/50 dark:odd:bg-black/50',
+                                    ]"
+                                    :hovered-set="hoverSet"
                                     :sets="sets"
+                                    @hover="onHover"
                                 />
                             </div>
                         </div>
@@ -109,3 +145,11 @@ const appointments = computed(() =>
         </div>
     </div>
 </template>
+<style lang="css">
+.planner-hovered {
+    background-color: var(--color-slate-300);
+}
+.dark .planner-hovered {
+    background-color: var(--color-slate-700);
+}
+</style>

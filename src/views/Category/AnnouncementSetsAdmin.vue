@@ -209,7 +209,7 @@ const addSet: Ref<Omit<CategoryDataAnnouncementSet, 'id' | 'type'>> = ref({
                     <div
                         v-for="set in totalSets"
                         :key="getDateString(set.date) + set.eventId"
-                        class="grid grid-cols-4 gap-1 even:bg-gray-100"
+                        class="grid grid-cols-4 gap-1 even:bg-gray-100 dark:even:bg-gray-800"
                     >
                         <div>{{ format(set.date, 'DD.MM.YYYY') }}</div>
                         <div>{{ set.title }}</div>

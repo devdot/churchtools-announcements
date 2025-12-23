@@ -60,26 +60,25 @@ const appointments = computed(() =>
                                     :key="custom.id"
                                     :announcement="custom"
                                     :category="props.category"
-                                    class="flex h-10 gap-1 p-1 even:bg-gray-100"
+                                    class="flex h-10 gap-1 p-1 even:bg-gray-100 even:dark:bg-gray-800"
                                 />
                                 <PlannerAnnouncement
                                     v-for="appointment in appointments"
                                     :key="appointment.id + appointment.startDate"
                                     :announcement="appointment"
                                     :category="props.category"
-                                    class="flex h-10 gap-1 p-1 even:bg-gray-100"
+                                    class="flex h-10 gap-1 p-1 even:bg-gray-100 even:dark:bg-gray-800"
                                 />
                             </div>
                         </div>
-                        <div class="grow overflow-x-auto bg-gray-100">
-                            <div
-                                class="sticky top-0 z-10 flex border-b border-gray-400 bg-gray-100"
-                            >
+                        <div class="grow overflow-x-auto bg-gray-100 dark:bg-gray-800">
+                            <div class="sticky top-0 z-10 flex border-b border-gray-400">
                                 <PlannerSet
                                     v-for="set in sets"
                                     :key="set.id"
                                     :appointments="appointments"
                                     :category="props.category"
+                                    class="odd:bg-gray-200 odd:dark:bg-gray-700"
                                     :customs="customs"
                                     :set="set"
                                 />
@@ -91,6 +90,7 @@ const appointments = computed(() =>
                                     :key="custom.id"
                                     :announcement="custom"
                                     :category="category"
+                                    class="odd:bg-white/50 dark:odd:bg-black/50"
                                     :sets="sets"
                                 />
                                 <PlannerFields
@@ -98,6 +98,7 @@ const appointments = computed(() =>
                                     :key="appointment.id + appointment.startDate"
                                     :announcement="appointment"
                                     :category="category"
+                                    class="odd:bg-white/50 dark:odd:bg-black/50"
                                     :sets="sets"
                                 />
                             </div>

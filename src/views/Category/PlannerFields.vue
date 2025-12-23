@@ -139,8 +139,12 @@ const changed = function (checked: boolean, set: AnnouncementSet) {
 };
 </script>
 <template>
-    <div class="flex h-10 odd:bg-white/50">
-        <div v-for="set in sets" :key="set.id" class="w-10 p-2 odd:bg-gray-300/50">
+    <div class="flex h-10">
+        <div
+            v-for="set in sets"
+            :key="set.id"
+            class="w-10 p-2 odd:bg-gray-300/50 dark:odd:bg-gray-700/50"
+        >
             <Checkbox
                 binary
                 :disabled="isSaving || !filterSetTime(set)"

@@ -39,27 +39,27 @@ const deleteConfirm = ref(false);
 const bg = computed(() => {
     switch (props.level) {
         case 0:
-            return 'bg-white';
+            return 'dark:bg-foreground-primary bg-white';
         case 1:
-            return 'bg-gray-100';
+            return 'dark:bg-gray-800 bg-gray-100';
         case 2:
-            return 'bg-gray-200';
+            return 'dark:bg-gray-700 bg-gray-200';
         case 3:
-            return 'bg-gray-300';
+            return 'dark:bg-gray-600 bg-gray-300';
         default:
-            return 'bg-gray-400';
+            return 'dark:bg-gray-500 bg-gray-400';
     }
 });
 </script>
 <template>
     <div class="rounded-md border border-gray-500 shadow-md">
-        <div class="flex rounded-t-md border-b border-gray-500 bg-white">
+        <div class="flex rounded-t-md border-b border-gray-500 bg-white dark:bg-gray-900">
             <div class="grow p-2">
                 {{ header }}
             </div>
             <div class="flex justify-center divide-x divide-gray-500 border-l border-gray-500">
                 <button
-                    class="p-2 not-disabled:cursor-pointer not-disabled:hover:bg-gray-200"
+                    class="p-2 not-disabled:cursor-pointer not-disabled:hover:bg-gray-200 not-disabled:hover:dark:bg-gray-700"
                     :disabled="!canEdit"
                     title="Regel negieren"
                     @click="rule.negate = !rule.negate"
@@ -69,26 +69,30 @@ const bg = computed(() => {
                 </button>
                 <button
                     v-if="canDelete && !deleteConfirm"
-                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    class="cursor-pointer p-2 hover:bg-gray-200 hover:dark:bg-gray-700"
                     @click="deleteConfirm = true"
                 >
                     <i class="fa-solid fa-trash"></i>
                 </button>
                 <button
                     v-if="canDelete && deleteConfirm"
-                    class="cursor-pointer p-2 text-red-500 hover:bg-gray-200"
+                    class="cursor-pointer p-2 text-red-500 hover:bg-gray-200 hover:dark:bg-gray-700"
                     @click="emits('deletedRule')"
                 >
                     <i class="fa-solid fa-check"></i>
                 </button>
                 <div
                     v-if="collapsed"
-                    class="cursor-pointer p-2 hover:bg-gray-200"
+                    class="cursor-pointer p-2 hover:bg-gray-200 hover:dark:bg-gray-700"
                     @click="collapsed = false"
                 >
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
-                <div v-else class="cursor-pointer p-2 hover:bg-gray-200" @click="collapsed = true">
+                <div
+                    v-else
+                    class="cursor-pointer p-2 hover:bg-gray-200 hover:dark:bg-gray-700"
+                    @click="collapsed = true"
+                >
                     <i class="fa-solid fa-chevron-up"></i>
                 </div>
             </div>

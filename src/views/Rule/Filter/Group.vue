@@ -24,15 +24,15 @@ const deletedRule = function (key: number) {
 const connectBg = computed(() => {
     switch (props.level) {
         case 0:
-            return 'bg-gray-300';
+            return 'bg-gray-300 dark:bg-gray-700';
         case 1:
-            return 'bg-gray-400';
+            return 'bg-gray-400 dark:bg-gray-600';
         case 2:
-            return 'bg-gray-500';
+            return 'bg-gray-500 dark:bg-gray-500';
         case 3:
-            return 'bg-gray-600';
+            return 'bg-gray-600 dark:bg-gray-400';
         default:
-            return 'bg-gray-700';
+            return 'bg-gray-700 dark:bg-gray-300';
     }
 });
 </script>

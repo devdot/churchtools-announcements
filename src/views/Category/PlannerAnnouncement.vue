@@ -13,7 +13,7 @@ const popover = ref();
 const togglePopover = event => popover.value.toggle(event);
 </script>
 <template>
-    <div class="flex h-10 gap-1 p-1 odd:bg-white">
+    <div class="flex h-10 gap-1 p-1">
         <span class="w-32 shrink-0 leading-8">{{
             typeof announcement.startDate === 'string'
                 ? formatDate(new Date(announcement.startDate), true)

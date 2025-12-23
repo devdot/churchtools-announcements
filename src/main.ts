@@ -46,7 +46,7 @@ app.use(PrimeVue, {
     theme: {
         preset: Lara,
         options: {
-            darkModeSelector: 'system',
+            darkModeSelector: '.dark', // CT stores darkmode at body, primevue expects it at html tag > App.vue sets the value on load
         },
     },
 });

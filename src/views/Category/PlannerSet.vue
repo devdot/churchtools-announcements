@@ -30,7 +30,7 @@ const sum = computed(
 );
 </script>
 <template>
-    <div class="h-full w-10 odd:bg-gray-200">
+    <div class="h-full w-10">
         <div class="h-24 w-10 p-0.5" :style="{ writingMode: 'vertical-lr' }" :title="set.title">
             {{ set.title }}
         </div>

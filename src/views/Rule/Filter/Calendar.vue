@@ -10,7 +10,7 @@ const { calendars } = useCalendars();
 </script>
 <template>
     <div>
-        <select v-model="filter.calendarId" :disabled="!props.canEdit">
+        <select v-model="filter.calendarId" class="w-full border p-0.5" :disabled="!props.canEdit">
             <option class="italic" :value="-1">Alle</option>
             <option v-for="calendar in calendars" :key="calendar.id" :value="calendar.id">
                 {{ calendar.name }}

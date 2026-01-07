@@ -9,18 +9,22 @@ const fields: RuleFilterTextFields[] = ['title', 'subtitle', 'description'];
 const fieldNames = ['Titel', 'Untertitel', 'Beschreibung'];
 </script>
 <template>
-    <div>
+    <div class="space-y-2">
         <div>
-            <select v-model="filter.field" :disabled="!props.canEdit">
+            <select v-model="filter.field" class="w-full border p-0.5" :disabled="!props.canEdit">
                 <option v-for="(field, key) in fields" :key="field" :value="field">
                     {{ fieldNames[key] }}
                 </option>
             </select>
         </div>
-        <div class="flex">
-            <input v-model="filter.search" class="border" :disabled="!props.canEdit" />
-            <input v-model="filter.regex" :disabled="!props.canEdit" type="checkbox" />
-            <label>regex</label>
+        <div class="flex gap-2">
+            <input v-model="filter.search" class="flex-1 border p-0.5" :disabled="!props.canEdit" />
+            <input
+                v-model="filter.regex"
+                v-tooltip="'Reguläre Ausdrücke (regex) verwenden'"
+                :disabled="!props.canEdit"
+                type="checkbox"
+            />
         </div>
     </div>
 </template>

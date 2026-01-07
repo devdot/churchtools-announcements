@@ -23,7 +23,7 @@ const createdRule = () => {
 </script>
 <template>
     <div>
-        <select v-model="filter.create" @change="createdRule">
+        <select v-model="filter.create" class="w-full border p-0.5" @change="createdRule">
             <option class="italic" :value="null">Filter wählen</option>
             <option v-for="option in options" :key="option" :value="option">
                 {{ names[option] ?? option }}

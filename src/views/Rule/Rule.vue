@@ -16,6 +16,8 @@ const props = withDefaults(
     >(),
     filterDefaults,
 );
+// todo: check if it's a good idea to make this non-reactive
+// that way we might need to work with emits but solve the stupid problems with reactivity and watching
 const rule = reactive(props.rule);
 const canDelete = computed(() => props.canEdit && props.level > 0);
 

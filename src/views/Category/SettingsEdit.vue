@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { subtract } from 'date-and-time';
 import {
     Button,
+    ButtonGroup,
     Card,
     Divider,
     FloatLabel,
@@ -10,8 +12,9 @@ import {
     Select,
     Textarea,
 } from 'primevue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAnnouncements } from '../../composables/useAnnouncements';
 import useCalendars from '../../composables/useCalendars';
 import useCategories from '../../composables/useCategories';
 import useCategory from '../../composables/useCategory';
@@ -58,6 +61,19 @@ const saveMain = function () {
 const confirmDelete = ref(false);
 const del = function () {
     deleteCategory(category.value).then(() => router.push({ name: 'overview' }));
+};
+
+const { options, deleteCustom } = useAnnouncements(props.category);
+const prunableOldOptions = computed(() =>
+    options.value.filter(
+        option =>
+            subtract(new Date(), new Date(option.a_date)).toDays().value +
+                settings.value.pruneDays <
+            0,
+    ),
+);
+const pruneOldOptions = function () {
+    prunableOldOptions.value.map(deleteCustom);
 };
 </script>
 <template>
@@ -293,6 +309,20 @@ const del = function () {
                         >Speichern</Button
                     >
                 </div>
+            </template>
+        </Card>
+        <Card>
+            <template #content>
+                <ButtonGroup>
+                    <Button
+                        :badge="prunableOldOptions.length + ''"
+                        :disabled="prunableOldOptions.length === 0"
+                        icon="fa-solid fa-trash"
+                        label="Abgelaufene Daten löschen"
+                        severity="secondary"
+                        @click="pruneOldOptions"
+                    />
+                </ButtonGroup>
             </template>
         </Card>
     </div>

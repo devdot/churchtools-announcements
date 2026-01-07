@@ -16,7 +16,11 @@ const menu = ref([
     { route: 'category.announcements', label: 'Ansagen', icon: 'fa-solid fa-bullhorn' },
     { route: 'category.planner', label: 'Planer', icon: 'fa-solid fa-calendar-days' },
     { route: 'category.rules', label: 'Kalender-Filter', icon: 'fa-solid fa-filter' },
-    { route: 'category.sets', label: 'Ankündigungs-Termine', icon: 'fa-solid fa-calendar-day' },
+    {
+        route: 'category.sets.admin',
+        label: 'Ankündigungs-Termine',
+        icon: 'fa-solid fa-calendar-day',
+    },
     { route: 'category.settings', label: 'Einstellungen', icon: 'fa-solid fa-gear' },
 ]);
 

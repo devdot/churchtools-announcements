@@ -29,6 +29,12 @@ const routes: RouteRecordRaw[] = [
                 props: true,
             },
             {
+                path: 'sets/:setId',
+                name: 'category.sets',
+                component: CategoryAnnouncementSets,
+                props: true,
+            },
+            {
                 path: 'announcements',
                 name: 'category.announcements',
                 component: CategoryAnnouncements,
@@ -47,8 +53,8 @@ const routes: RouteRecordRaw[] = [
                 props: true,
             },
             {
-                path: 'sets',
-                name: 'category.sets',
+                path: 'sets/admin',
+                name: 'category.sets.admin',
                 component: CategoryAnnouncementSetsAdmin,
                 props: true,
             },

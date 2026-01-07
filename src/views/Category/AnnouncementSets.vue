@@ -9,22 +9,33 @@ import type { Category } from '../../types/Category';
 import Loading from '../Utils/Loading.vue';
 import AnnouncementSet from './AnnouncementSet.vue';
 
-const props = defineProps<{ category: Category; categoryId: string | number }>();
+const props = defineProps<{
+    category: Category;
+    categoryId: string | number;
+    setId?: string | number;
+}>();
 
 const { sets, setsLoaded } = useAnnouncements(props.category);
 const { can: canFn } = usePermissions();
 const can = canFn(props.category);
 
-const findClosestSet = () => {
+const findInitialSet = () => {
+    if (props.setId) {
+        return sets.value.find(set => set.id == props.setId) ?? null;
+    }
+
     const now = new Date().getTime();
     return sets.value.find(set => set.date.getTime() > now) ?? null;
 };
+watch(props, () => {
+    selectedSet.value = findInitialSet();
+});
 watch(sets, () => {
     if (selectedSet.value === null) {
-        selectedSet.value = findClosestSet();
+        selectedSet.value = findInitialSet();
     }
 });
-const selectedSet: Ref<AnnouncementSetType | null> = ref(findClosestSet());
+const selectedSet: Ref<AnnouncementSetType | null> = ref(findInitialSet());
 
 const select = function (int: -1 | 1) {
     const index = sets.value.findIndex(s => s.id === (selectedSet.value?.id ?? 0));
@@ -32,6 +43,7 @@ const select = function (int: -1 | 1) {
     if (sel) {
         selectedSet.value = sel;
     }
+    return selectedSet;
 };
 
 const makeName = (set: AnnouncementSetType | null) =>
@@ -43,7 +55,16 @@ const makeName = (set: AnnouncementSetType | null) =>
         <Card>
             <template #content>
                 <InputGroup>
-                    <Button icon="fa-solid fa-chevron-left" severity="info" @click="select(-1)" />
+                    <Button
+                        icon="fa-solid fa-chevron-left"
+                        severity="info"
+                        @click="
+                            $router.push({
+                                name: 'category.sets',
+                                params: { setId: select(-1).value.id },
+                            })
+                        "
+                    />
                     <Select v-model="selectedSet" :loading="!setsLoaded" :options="sets">
                         <template #value="prop">
                             {{ makeName(prop.value ?? null) }}
@@ -58,9 +79,18 @@ const makeName = (set: AnnouncementSetType | null) =>
                         label=""
                         outlined
                         severity="info"
-                        @click="$router.push({ name: 'category.sets' })"
+                        @click="$router.push({ name: 'category.sets.admin' })"
                     />
-                    <Button icon="fa-solid fa-chevron-right" severity="info" @click="select(1)" />
+                    <Button
+                        icon="fa-solid fa-chevron-right"
+                        severity="info"
+                        @click="
+                            $router.push({
+                                name: 'category.sets',
+                                params: { setId: select(1).value.id },
+                            })
+                        "
+                    />
                 </InputGroup>
             </template>
         </Card>

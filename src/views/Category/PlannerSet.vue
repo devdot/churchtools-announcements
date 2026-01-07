@@ -31,9 +31,14 @@ const sum = computed(
 </script>
 <template>
     <div class="h-full w-10">
-        <div class="h-24 w-10 p-0.5" :style="{ writingMode: 'vertical-lr' }" :title="set.title">
+        <router-link
+            class="h-24 w-10 p-0.5"
+            :style="{ writingMode: 'vertical-lr' }"
+            :title="set.title"
+            :to="{ name: 'category.sets', params: { setId: set.id } }"
+        >
             {{ set.title }}
-        </div>
+        </router-link>
         <div class="h-6 text-center" :title="formatDate(set.date)">
             {{ format(set.date, 'DD.MM.') }}
         </div>

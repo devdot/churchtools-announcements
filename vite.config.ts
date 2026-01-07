@@ -23,5 +23,13 @@ export default ({ mode }) => {
         define: {
             '__APP_VERSION__': JSON.stringify(process.env.npm_package_version),
         },
+        server: {
+            proxy: {
+                '/system': {
+                    target: 'https://' + process.env.VITE_BASE_URL,
+                    changeOrigin: true,
+                }
+            }
+        },
     });
 };
